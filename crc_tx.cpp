@@ -5,6 +5,7 @@
 using namespace std;
 bitset<13> compute(bitset<1000>temp, int length) {
 	bitset<13>c12(rcrc12), checksum;
+	cout <<"length is " << length << endl;
 	//cout << "original c12: " <<c12.to_string() << endl;
 	//cout <<"original data: " << temp.to_string() << endl;
 	int pos = 0;
@@ -30,17 +31,21 @@ bitset<13> compute(bitset<1000>temp, int length) {
 			checksum>>=1;
 			checksum[12] = temp[pos];
 		}
-		/*cout <<"==================================" << endl;
+		/* 
+		cout <<"==================================" << endl;
 		for (int i= 0; i < 13; i++) cout << checksum[i];
 		cout << endl << "pos: " << pos << endl;
-		cout <<"==================================" << endl;*/
-		if (pos < length) {
+		cout << endl <<"==================================" << endl;
+		if (pos+1 == length) {
+			cout <<"## pos is " << pos << endl;
+			break;
+		} else*/ if (pos < length && checksum[0]) {
 			checksum^=c12;
 			ans[pos] = 1;
 		}
-	}
+	} 
 	cout <<"----------------answer-----------------" << endl << endl;
-	checksum <<=1;
+	//checksum <<=1;
 	//cout <<"crc  : " << checksum.to_string() << endl;
 	for (int i= 0; i < 12; i++) cout << checksum[i];
 	//cout <<"ans  : " << ans.to_string() << endl;
@@ -54,6 +59,7 @@ int main () {
 	vector<bitset<1000> >data;
 	vector<int>len;
 	ifstream infile("dataTx.txt");
+	//ifstream infile("bug.txt");
 	//start to read file;
 	while (getline(infile, line)) {
 		cout << line << endl;
@@ -68,7 +74,7 @@ int main () {
 	for (int i = 0; i < data.size(); i++) {
 		cout <<"codeword:" << data[i].to_string() << endl;
 		//cout <<"crc:" << compute(data[i], len[i]+13).to_string()  << endl;
-		compute(data[i], len[i]+13);
+		compute(data[i], len[i]+12);
 	}
 	return 0;
 }
