@@ -8,36 +8,43 @@ bitset<13> compute(bitset<1000>temp, int length) {
 	//cout << "original c12: " <<c12.to_string() << endl;
 	//cout <<"original data: " << temp.to_string() << endl;
 	int pos = 0;
-	while (!temp[pos]) {
+	/*while (!temp[pos]) {
 		temp>>=1;
-	}
+	}*/ 
 	for (int i= 0; i < 13; i++) checksum[i] = temp[i];
 	bitset<1000>ans;
+	cout <<"cs: "<< checksum.to_string() << endl;
 	//cout <<"begin at pos: " << pos << endl;
-	pos=13;
+	pos=12;
 	while (pos < length) {
-		
+		/*
 		cout <<"==================================" << endl;
 		for (int i= 0; i < 13; i++) cout << checksum[i];
 		cout << endl << "pos: " << pos << endl;
 		cout <<"==================================" << endl;
-			 
+		*/  
 		//cout <<"we got:  " << checksum.to_string() << endl;
-		while (!checksum[0]) {
-			ans[0] = 0;
-			ans<<=1;
+		while (!checksum[0] && pos < length) {
+			ans[pos] = 0;
+			pos++;
 			checksum>>=1;
 			checksum[12] = temp[pos];
-			pos++;
 		}
-		checksum^=c12;
-		ans[0] = 1;
-		ans<<=1;
+		/*cout <<"==================================" << endl;
+		for (int i= 0; i < 13; i++) cout << checksum[i];
+		cout << endl << "pos: " << pos << endl;
+		cout <<"==================================" << endl;*/
+		if (pos < length) {
+			checksum^=c12;
+			ans[pos] = 1;
+		}
 	}
 	cout <<"----------------answer-----------------" << endl << endl;
-	//for (int i= 0; i < 13; i++) cout << checksum[i];
-	cout <<"crc  : " << checksum.to_string() << endl;
-	cout <<"----------------------------------" << endl;
+	checksum <<=1;
+	//cout <<"crc  : " << checksum.to_string() << endl;
+	for (int i= 0; i < 12; i++) cout << checksum[i];
+	//cout <<"ans  : " << ans.to_string() << endl;
+	cout <<endl <<"----------------------------------" << endl;
 	//cout <<"we got divide: " << ans.to_string() << endl;
 	//010111100100
 	return checksum; 
@@ -59,9 +66,9 @@ int main () {
 	//lets compute crc checksum
 	cout <<"================ start =================" << endl;
 	for (int i = 0; i < data.size(); i++) {
-		//cout <<"codeword:" << data[i].to_string() << endl;
-		//cout <<"crc:" << compute(data[i]).to_string()  << endl;
-		compute(data[i], len[i]+12);
+		cout <<"codeword:" << data[i].to_string() << endl;
+		//cout <<"crc:" << compute(data[i], len[i]+13).to_string()  << endl;
+		compute(data[i], len[i]+13);
 	}
 	return 0;
 }
