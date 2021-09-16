@@ -2,6 +2,7 @@
 #include <algorithm>
 #define crc12 "1100000001111"
 #define rcrc12 "1111000000011"
+#define DEBUG true
 using namespace std;
 bitset<13> compute(bitset<1000>temp, int length) {
 	bitset<13>c12(rcrc12), checksum;
@@ -103,10 +104,13 @@ int main () {
 		bitset<1000>tmp(line);
 		bitset<1000>temp(line);
 		len.push_back(line.size());
+		//cout << line.size() <<" , " << flip.size() << endl;
 		//cout << tmp.to_string() << endl;
 		for (int i = 0; i < len.back(); i++) {
 			if (flip[i] == '1') temp.flip(i);
+			//cout << temp[i];
 		}
+		//cout << endl;
 		data.push_back(tmp);
 		wrong.push_back(temp);
 	}
@@ -121,6 +125,13 @@ int main () {
 			if (crcOutcome[j]) scrc.push_back('1');
 			else scrc.push_back('0');
 		}
+#if DEBUG
+		cout <<"---------------- the wrong bits --------------" << endl;
+		for (int j = 0; j < 300; j++) {
+			cout << wrong[i][j];
+		}
+		cout << endl <<"----------------------------------------------" << endl;
+#endif
 		if (compute(wrong[i], len[i]+12).count() == 0) crcvalid = "pass";
 		else crcvalid = "not pass";
 		cout << "crc: "<< scrc <<" result: "<< crcvalid << endl;
