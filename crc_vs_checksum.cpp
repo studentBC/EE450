@@ -2,7 +2,7 @@
 #include <algorithm>
 #define crc12 "1100000001111"
 #define rcrc12 "1111000000011"
-#define DEBUG true
+#define DEBUG false
 using namespace std;
 bitset<13> compute(bitset<1000>temp, int length) {
 	bitset<13>c12(rcrc12), checksum;
@@ -45,12 +45,14 @@ bitset<13> compute(bitset<1000>temp, int length) {
 			ans[pos] = 1;
 		}
 	} 
+#if DEBUG
 	cout <<"----------------answer-----------------" << endl << endl;
 	//checksum <<=1;
 	//cout <<"crc  : " << checksum.to_string() << endl;
 	for (int i= 0; i < 12; i++) cout << checksum[i];
 	//cout <<"ans  : " << ans.to_string() << endl;
 	cout <<endl <<"----------------------------------" << endl;
+#endif
 	//cout <<"we got divide: " << ans.to_string() << endl;
 	//010111100100
 	return checksum; 
@@ -58,20 +60,40 @@ bitset<13> compute(bitset<1000>temp, int length) {
 bitset<8> internetChecksum (vector<bitset<9> > bt) {
 	bool carry = false;
 	for (int i = 1; i < bt.size(); i++) {
-		carry = false;
+#if DEBUG
+		cout <<"====== check bitset now ======" << endl;
+		for (int i = 0; i < bt.size(); i++) 
+			for (int j = 0; j < 9; j++) cout << bt[i][j];
+			cout << endl;
+		cout << endl;
+#endif 
+		int carry = 0;
 		for (int j = 0; j < 9; j ++) {
-			if (carry) bt[0][j] = 1;
+			if (carry) {
+				carry--;
+				if (!bt[0][j]) {
+					bt[0][j] = 1;
+				} else {
+					bt[0][j] = 0;
+					carry++;
+				}
+			}
 			if (bt[0][j]&bt[i][j]) {
 				bt[0][j] = 0;
-				carry = true;
+				carry++;
 			} else if (bt[0][j] | bt[i][j]) {
 				bt[0][j] = 1;
-				carry = false;
 			} else {
 				bt[0][j] = 0;
-				carry = false;
 			}
 		}
+#if DEBUG
+		cout <<"####### result sum #########" << endl;
+		for (int j = 0; j < 9; j++) {
+			cout << bt[0][j];
+		}
+		cout << endl <<"###########################" << endl;
+#endif
 		while (bt[0][8]) {
 			bt[0][8] = 0;
 			for (int j = 0; j < 9; j ++) {
@@ -83,6 +105,13 @@ bitset<8> internetChecksum (vector<bitset<9> > bt) {
 				}
 			}
 		}
+#if DEBUG
+		cout <<"####### result sum #########" << endl;
+		for (int j = 0; j < 9; j++) {
+			cout << bt[0][j];
+		}
+		cout << endl <<"###########################" << endl;
+#endif
 	}
 	bitset<8>ans;
 	for (int i = 0; i < 8; i++) ans[i] = bt[0][i];
@@ -99,7 +128,7 @@ int main () {
 	while (getline(infile, line)) {
 		istringstream iss(line);
 		iss >> line >> flip;
-		cout << line <<" error: " << flip << endl;
+		cout << line.size() <<" error: " << flip.size() << endl << endl;
 		reverse(line.begin(), line.end());
 		bitset<1000>tmp(line);
 		bitset<1000>temp(line);
@@ -143,16 +172,38 @@ int main () {
 			for (int k = 7; k > -1; k--, j++) {
 				tt[k] = data[i][j]; 
 				ff[k] = wrong[i][j];
+				//cout << ff[k];
 			}
+			//cout << endl;
 			group.push_back(tt);
 			ng.push_back(ff);
 		}
+#if DEBUG
+		cout <<"---------------- the wrong bits --------------" << endl;
+		for (int j = 0; j < ng.size(); j++) {
+			for (int k = 0; k < 8; k++) cout << ng[j][k];
+			cout << endl;
+		}
+		for (int j = 0; j < group.size(); j++) {
+			for (int k = 0; k < 8; k++) cout << group[j][k];
+			cout << endl;
+		}
+		cout << endl <<"----------------------------------------------" << endl;
+#endif
 		bitset<8>cks = internetChecksum(group);
 		bitset<8>fcks = internetChecksum(ng);
-		
+#if DEBUG
+		cout <<"---------------- the cks bits --------------" << endl;
+		for (int k = 0; k < 8; k++) cout << cks[k];
+		cout << endl;
+		for (int k = 0; k < 8; k++) cout << fcks[k];
+		cout << endl;
+		cout << endl <<"----------------------------------------------" << endl;
+#endif
+	
 		if (cks == fcks) crcvalid = "pass";
 		else crcvalid = "not pass";
-		cout << "checksum: "<< cks.to_string() <<" result: "<< crcvalid << endl;
+		cout << "checksum: "<< cks.to_string() <<" result: "<< crcvalid << endl << endl;
 	}
 	return 0;
 }
