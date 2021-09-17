@@ -57,8 +57,10 @@ bitset<13> compute(bitset<1000>temp, int length) {
 	//010111100100
 	return checksum; 
 }
+
+
 bitset<8> internetChecksum (vector<bitset<9> > bt) {
-	bool carry = false;
+	//bool carry = false;
 	for (int i = 1; i < bt.size(); i++) {
 #if DEBUG
 		cout <<"====== check bitset now ======" << endl;
@@ -114,13 +116,69 @@ bitset<8> internetChecksum (vector<bitset<9> > bt) {
 #endif
 	}
 	bitset<8>ans;
-	for (int i = 0; i < 8; i++) ans[i] = bt[0][i];
+	for (int i = 0; i < 8; i++) ans[i] = !bt[0][i];
 	return ans;
 }
+
+bool validChecksum(vector<bitset<9> > bt, bitset<9>checksum) {
+	for (int i = 1; i < bt.size(); i++) {
+#if DEBUG
+		cout <<"====== check bitset now ======" << endl;
+		for (int i = 0; i < bt.size(); i++) 
+			for (int j = 0; j < 9; j++) cout << bt[i][j];
+			cout << endl;
+		cout << endl;
+#endif 
+		int carry = 0;
+		for (int j = 0; j < 9; j ++) {
+			if (carry) {
+				carry--;
+				if (!bt[0][j]) {
+					bt[0][j] = 1;
+				} else {
+					bt[0][j] = 0;
+					carry++;
+				}
+			}
+			if (bt[0][j]&bt[i][j]) {
+				bt[0][j] = 0;
+				carry++;
+			} else if (bt[0][j] | bt[i][j]) {
+				bt[0][j] = 1;
+			} else {
+				bt[0][j] = 0;
+			}
+		}
+		while (bt[0][8]) {
+			bt[0][8] = 0;
+			for (int j = 0; j < 9; j ++) {
+				if (bt[0][j]) {
+					bt[0][j] = 0;
+				} else {
+					bt[0][j] = 1;
+					break;
+				}
+			}
+		}
+	}
+#if DEBUG
+		cout <<"####### result sum #########" << endl;
+		for (int j = 0; j < 8; j++) cout << bt[0][j];
+		cout << endl;
+		for (int j = 0; j < 8; j++) cout << checksum[j];
+		cout << endl <<"###########################" << endl;
+#endif
+
+	for (int i = 0; i < 8; i++) {
+		if (!((bt[0][i]&checksum[i]) == 0 && bt[0][i]|checksum[i])) return false;
+	}
+	return true;
+}
+
 int main () {
 	string line, flip;
 	int count = 0;
-	vector<bitset<1000> >data, wrong;
+	vector<bitset<1000> >data, wrong, flips;
 	vector<int>len;
 	ifstream infile("dataVs.txt");
 	//ifstream infile("bug.txt");
@@ -128,20 +186,24 @@ int main () {
 	while (getline(infile, line)) {
 		istringstream iss(line);
 		iss >> line >> flip;
-		cout << line.size() <<" error: " << flip.size() << endl << endl;
+		//cout << line.size() <<" error: " << flip.size() << endl << endl;
 		reverse(line.begin(), line.end());
+		reverse(flip.begin(), flip.end());
 		bitset<1000>tmp(line);
 		bitset<1000>temp(line);
+		bitset<1000>tempp(flip);
 		len.push_back(line.size());
 		//cout << line.size() <<" , " << flip.size() << endl;
 		//cout << tmp.to_string() << endl;
 		for (int i = 0; i < len.back(); i++) {
-			if (flip[i] == '1') temp.flip(i);
+			if (tempp[i]) temp.flip(i);
 			//cout << temp[i];
 		}
+
 		//cout << endl;
 		data.push_back(tmp);
 		wrong.push_back(temp);
+		flips.push_back(tempp);
 	}
 	//lets compute crc checksum
 	cout <<"================ start =================" << endl;
@@ -150,14 +212,15 @@ int main () {
 		string scrc, crcvalid;
 		scrc.pop_back();
 		for (int k = len[i], j = 0; j < 12 ;k++, j++) {
-			wrong[i][k] = crcOutcome[j];
+			if (flips[i][k] == 0) wrong[i][k] = crcOutcome[j];
+			else wrong[i][k] = !crcOutcome[j];
 			if (crcOutcome[j]) scrc.push_back('1');
 			else scrc.push_back('0');
 		}
 #if DEBUG
 		cout <<"---------------- the wrong bits --------------" << endl;
-		for (int j = 0; j < 300; j++) {
-			cout << wrong[i][j];
+		for (int j = 0, k = len[i]; j < 12; j++, k++) {
+			cout << wrong[i][k];
 		}
 		cout << endl <<"----------------------------------------------" << endl;
 #endif
@@ -191,17 +254,22 @@ int main () {
 		cout << endl <<"----------------------------------------------" << endl;
 #endif
 		bitset<8>cks = internetChecksum(group);
-		bitset<8>fcks = internetChecksum(ng);
-#if DEBUG
+		//make error checksum
+		bitset<9>fck;
+		for (int a = len[i], b = 7; b > -1; a++, b--) {
+			if (flips[i][a]) fck[b] = !cks[b];
+			else fck[b] = cks[b];
+		}
+#if DEBUG 
 		cout <<"---------------- the cks bits --------------" << endl;
 		for (int k = 0; k < 8; k++) cout << cks[k];
 		cout << endl;
-		for (int k = 0; k < 8; k++) cout << fcks[k];
+		for (int k = 0; k < 8; k++) cout << fck[k];
 		cout << endl;
 		cout << endl <<"----------------------------------------------" << endl;
 #endif
 	
-		if (cks == fcks) crcvalid = "pass";
+		if (validChecksum(ng, fck)) crcvalid = "pass";
 		else crcvalid = "not pass";
 		cout << "checksum: "<< cks.to_string() <<" result: "<< crcvalid << endl << endl;
 	}
