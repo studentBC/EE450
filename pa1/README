@@ -1,0 +1,31 @@
+Name: Lung Chin
+Student ID: 8928699544
+
+[what I have done in my assignment]:
+
+To sum up, I wrote a function which can calculate CRC and checksum.
+Besides, I also complete a function which can verify whehter data is correct or not by using a given checksum.
+
+[Introduction to my program and functions]:
+
+
+#crc_rx.cpp
+It can read a given bit set and compute its crc by using CRC12 (the compute function in the file). I simply use a 13 length bitset to do xor and record its position so that I will not exceed the original data length.
+
+#crc_tx.cpp
+It simply reuse the compute function again to check whether the data is correct or not when the program is given a CRC. What I do is simply append the CRC to original data and computer CRC again. If the result is all zero then we can make sure that we get the correct answer. On the contrary, if the result contains any 1, then we get wrong.
+
+#crc_vs_checksum.cpp
+In addition to the previous compute function, I also write a function to calculate checksum by sum up bunchs of bytes. After sum up them together, I flip each or bits to get the correct checksum. Besides, I also write a function to check whether checksum is correct or not by adding groups of bytes and given checksum. If there the test result is not all 1 then the data get error.
+
+In this program, we need to use flip data to flip original data and checksum, and CRC data. After we get the false data, wrong checksum, and wrong CRC, we can use them to complete the request of PA1. The tricky part is that I can check whether flip data is all 0 or not to speed up my program but in order to check whether there is bug in my program or not, I simply use my function to compute every input data.
+
+
+
+[idiosyncrasy of my progject]:
+
+1. My program will be crash if user give more than 1000 bits since I just assume that the testdata will not exceed 1000 bits.
+
+2. user cannot choose CRC32, CRC48 ... etc since the homework only ask us to use CRC12.
+
+No any reuse code! all of them are done by myself.  
