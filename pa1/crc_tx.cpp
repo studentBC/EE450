@@ -3,6 +3,7 @@
 #define crc12 "1100000001111"
 #define rcrc12 "1111000000011"
 using namespace std;
+//the resuage code from crc_rx.cpp
 bitset<12> compute(bitset<1000>temp, int length) {
 	bitset<13>c12(rcrc12), checksum;
 	int pos = 0;
@@ -31,6 +32,7 @@ int main () {
 	vector<int>len;
 	vector<string>st;
 	ifstream infile("dataTx.txt");
+	//read the input file
 	while (getline(infile, line)) {
 		st.push_back( line);
 		reverse(line.begin(), line.end());
