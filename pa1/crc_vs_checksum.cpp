@@ -151,7 +151,7 @@ bool validChecksum(vector<bitset<9> > bt, bitset<9>checksum) {
 }
 
 int main () {
-	string line, flip;
+	string line = "", flip = "";
 	int count = 0;
 	vector<bitset<1000> >data, wrong, flips;
 	vector<int>len;
@@ -178,8 +178,8 @@ int main () {
 	//lets compute crc checksum
 	for (int i = 0; i < data.size(); i++) {
 		bitset<13>crcOutcome = compute(data[i], len[i]+12);
-		string scrc, crcvalid;
-		scrc.pop_back();
+		string scrc = "", crcvalid = "";
+		//scrc.pop_back();
 		for (int k = len[i], j = 0; j < 12 ;k++, j++) {
 			//get wrong crc by fliping bits
 			if (flips[i][k] == 0) wrong[i][k] = crcOutcome[j];
