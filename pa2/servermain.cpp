@@ -2,7 +2,7 @@
 #include <algorithm>
 #define BUFLEN 128
 using namespace std;
-unordered_map<string, unordered_set<string>>db;
+unordered_map<string, unordered_set<string> >db;
 void sigchld_handler(int s)
 {
     // waitpid() might overwrite errno, so we save and restore it:
@@ -30,8 +30,10 @@ char* getPacketData (int sockfd) {
    char    buf[BUFLEN];
    while ((n = recv(sockfd, buf, BUFLEN, 0)) > 0)
 	   write(STDOUT_FILENO, buf, n);
-   if (n < 0)
-	   err_sys("recv error");
+   if (n < 0) {
+	   perror("recv error");
+   		exit(1);
+   }
    return buf[0];
 }
 
@@ -40,6 +42,7 @@ int main () {
 	bool odd = true;
 	// Read from the text file
 	ifstream MyReadFile("list.txt");
+	cout <<"Upon reading the state lists:" << endl;
 	string line, city;
 	while (getline (MyReadFile, line)) {
 		if (odd) {
@@ -54,6 +57,11 @@ int main () {
 			}
 			odd = true;
 		}
+	}
+	for (auto& it: db) {
+		cout << it.first << ":" << endl;
+		for (string s : it.second) cout << s << endl;
+		cout << endl;
 	}
 	// Close the file
 	MyReadFile.close();
@@ -149,15 +157,19 @@ int main () {
             if (send(new_fd, ans, len, 0) == -1) {
                 perror("send successfully !");
 			} else perror("send failed !");
- 
+			cout << "Main Server has sent searching result to client "<< <client ID> <<" using TCP over port " << p->ai_protocol  << endl;
+			cout << "The Main Server has sent "+city+": Not found” to client"+<client ID>+" using TCP over port " << p->ai_protocol << endl;;
+
             close(new_fd);
             exit(0);
         } else if (pid < 0) {
-			err_sys("fork error");
+			perror("fork error");
+			exit(1);
 		} else {
 			/* parent */
 			if ((pid = waitpid(pid, &status, 0)) < 0)
-				err_sys("waitpid error");
+				perror("waitpid error");
+				exit(1);
 		}
         close(new_fd);  // parent doesn't need this
     }
