@@ -27,5 +27,5 @@
 //don't terminate client automatically
 //create child process
 //
-#define serverPort 33544
+#define serverPort "33544"
 

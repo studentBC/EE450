@@ -12,7 +12,15 @@ void sigchld_handler(int s)
 
     errno = saved_errno;
 }
-
+string convertToString(char* a, int size)
+{
+    int i;
+    string s = "";
+    for (i = 0; i < size; i++) {
+        s = s + a[i];
+    }
+    return s;
+}
 
 // get sockaddr, IPv4 or IPv6:
 void *get_in_addr(struct sockaddr *sa)
@@ -24,17 +32,44 @@ void *get_in_addr(struct sockaddr *sa)
     return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
 
-
+/*
 char* getPacketData (int sockfd) {
    int     n;
-   char    buf[BUFLEN];
-   while ((n = recv(sockfd, buf, BUFLEN, 0)) > 0)
-	   write(STDOUT_FILENO, buf, n);
+   char* buf = new char[BUFLEN];
+   cout <<"===========================" << endl;
+   if (n = recv(sockfd, buf, BUFLEN, 0) > 0) {
+		for (int i = 0; i < n; i++) cout << buf[i];
+   }
    if (n < 0) {
 	   perror("recv error");
    		exit(1);
    }
-   return buf[0];
+   return buf;
+}*/
+
+string findDB (string city) {
+	for (auto& it: db) {
+		if (db[it.first].count(city)) return it.first;
+	}
+	return "";
+}
+
+int initserver(int type, const struct sockaddr *addr, socklen_t alen, int qlen) {
+	int fd;
+	int err = 0;
+	if ((fd = socket(addr->sa_family, type, 0)) < 0)
+	   return(-1);
+	if (bind(fd, addr, alen) < 0)
+	   goto errout;
+	if (type == SOCK_STREAM || type == SOCK_SEQPACKET) {
+	   if (listen(fd, qlen) < 0) goto errout;
+	}
+    return(fd);
+errout:
+    err = errno;
+    close(fd);
+    errno = err;
+    return(-1);
 }
 
 
@@ -49,15 +84,15 @@ int main () {
 			city = line;
 			odd = false;
 		} else {
-			std::stringstream ss(line);
-			for (string i; ss >> i;) {
-				db[city].insert(i);
-				if (ss.peek() == ',')
-					ss.ignore();
+			string i; size_t pos = 0;
+			while ((pos = line.find(',')) != string::npos) {
+				db[city].insert(line.substr(0, pos));
+				line.erase(0, pos+1);
 			}
 			odd = true;
 		}
 	}
+	cout << endl;
 	for (auto& it: db) {
 		cout << it.first << ":" << endl;
 		for (string s : it.second) cout << s << endl;
@@ -93,14 +128,23 @@ int main () {
             perror("server: socket");
             continue;
         }
-
+/*
+ * struct addrinfo {
+     int               ai_flags;
+     int               ai_family;
+     int               ai_socktype;
+     int               ai_protocol;
+     socklen_t         ai_addrlen;
+     struct sockaddr  *ai_addr;		address
+     char             *ai_canonname;   canonical name of host 
+     struct addrinfo  *ai_next;        next in list 
+ }*/
         if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes,
                 sizeof(int)) == -1) {
             perror("setsockopt");
             exit(1);
         }
-
-        if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
+        if (::bind(sockfd, p->ai_addr, p->ai_addrlen) < 0) {
             close(sockfd);
             perror("server: bind");
             continue;
@@ -145,20 +189,40 @@ int main () {
             s, sizeof s);
         printf("server: got connection from %s\n", s);
 		pid = fork();
+		cout <<"pid is " << pid << endl;
         if (!pid) { // this is the child process
 			//need to get data from socket?
-			char* city = getPacketData(sockfd);
-			string ans;
-			if (db[state].count(city)) ans = city+" is associated with state "+ state;
+			//char* input = getPacketData(sockfd);
+			cout <<"===== ben 1 =====" << endl;
+			bool start = false;
+			string ans, city, clientID, state, input;
+			char    buf[BUFLEN]; int n = recv(new_fd, buf, BUFLEN, 0);
+			if (n) {
+				cout <<"n is " << n << endl;
+				for (int i = 0; i < n; i++) {
+					input.push_back(buf[i]);
+				}
+			}
+			cout <<"receive input: " << input << endl;
+			//get city + client id
+			for (int i = 0; i < input.size();i++) {
+				if (!start) clientID.push_back(input[i]);
+				else city.push_back(input[i]);
+				if (input[i] == ',') start = true;
+			}
+			cout <<" ben 2 " << endl;
+			state = findDB(city);
+			if (state.size()) ans = city+" is associated with state "+ state;
 			else ans = city+" not found";
-			len = ans.size();
+			len = ans.size()+1;
 
+			cout << "ans: " << ans << endl;
             close(sockfd); // child doesn't need the listener
-            if (send(new_fd, ans, len, 0) == -1) {
-                perror("send successfully !");
-			} else perror("send failed !");
-			cout << "Main Server has sent searching result to client "<< <client ID> <<" using TCP over port " << p->ai_protocol  << endl;
-			cout << "The Main Server has sent "+city+": Not found” to client"+<client ID>+" using TCP over port " << p->ai_protocol << endl;;
+            if (send(new_fd, &ans, len, 0) == -1) {
+				perror("send failed !");
+			} 
+			cout << "Main Server has sent searching result to client "<< clientID <<" using TCP over port " << to_string(p->ai_protocol) << endl;
+			cout << "The Main Server has sent "+city+": Not found” to client " << clientID << " using TCP over port " << to_string(p->ai_protocol) << endl;;
 
             close(new_fd);
             exit(0);
@@ -167,6 +231,7 @@ int main () {
 			exit(1);
 		} else {
 			/* parent */
+			int status;
 			if ((pid = waitpid(pid, &status, 0)) < 0)
 				perror("waitpid error");
 				exit(1);
