@@ -55,48 +55,48 @@ int main()
 	recordClientID(clientID);
 	//read user input
 	cout << "Client is up and running." << endl;
+	memset(&hints, 0, sizeof hints);
+	hints.ai_family = AF_UNSPEC;//either ipv4 or ipv6 internet domain
+	hints.ai_socktype = SOCK_STREAM;// for TCP usage
+
+	if ((rv = getaddrinfo("127.0.0.1", serverPort, &hints, &servinfo)) != 0) {
+		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
+		return 1;
+	}
+
+	// loop through all the results and connect to the first we can
+	for(p = servinfo; p != NULL; p = p->ai_next) {
+		cout <<p->ai_family <<" socket type: " << p->ai_socktype <<" protocol: " << p->ai_protocol << endl;
+		if ((sockfd = socket(p->ai_family, p->ai_socktype,
+				p->ai_protocol)) == -1) {
+			perror("client: socket");
+			continue;
+		}
+
+		if (connect(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
+			close(sockfd);
+			perror("client: connect");
+			continue;
+		}
+
+		break;
+	}
+
+	if (p == NULL) {
+		fprintf(stderr, "client: failed to connect\n");
+		return 2;
+	}
+	cout <<"ai addr: " << p->ai_addr->sa_data << endl;
+	inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr),
+			s, sizeof s);
+	printf("client: connecting to %s\n", s);
+	cout <<"prepare to send " << input << endl;
 
 	while(1) {
 		cout << "Enter City Name:" << endl;
 		getline(cin, input);
 		cout << "Client has sent city "<< input << " to Main Server using TCP ." << endl;
 
-		memset(&hints, 0, sizeof hints);
-		hints.ai_family = AF_UNSPEC;//either ipv4 or ipv6 internet domain
-		hints.ai_socktype = SOCK_STREAM;// for TCP usage
-
-		if ((rv = getaddrinfo("127.0.0.1", serverPort, &hints, &servinfo)) != 0) {
-			fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
-			return 1;
-		}
-
-		// loop through all the results and connect to the first we can
-		for(p = servinfo; p != NULL; p = p->ai_next) {
-			cout <<p->ai_family <<" socket type: " << p->ai_socktype <<" protocol: " << p->ai_protocol << endl;
-			if ((sockfd = socket(p->ai_family, p->ai_socktype,
-					p->ai_protocol)) == -1) {
-				perror("client: socket");
-				continue;
-			}
-
-			if (connect(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
-				close(sockfd);
-				perror("client: connect");
-				continue;
-			}
-
-			break;
-		}
-
-		if (p == NULL) {
-			fprintf(stderr, "client: failed to connect\n");
-			return 2;
-		}
-		cout <<"ai addr: " << p->ai_addr->sa_data << endl;
-		inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr),
-				s, sizeof s);
-		printf("client: connecting to %s\n", s);
-		cout <<"prepare to send " << input << endl;
 		string rawdata = clientID+","+input;
 		send(sockfd , &rawdata, rawdata.size()+1, 0 );
 		struct sockaddr_in  *sinp = (struct sockaddr_in *)p->ai_addr;

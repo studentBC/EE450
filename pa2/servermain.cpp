@@ -126,7 +126,7 @@ int main () {
         if ((sockfd = socket(p->ai_family, p->ai_socktype,
                 p->ai_protocol)) == -1) {
             perror("server: socket");
-            continue;
+			break;
         }
 /*
  * struct addrinfo {
@@ -175,25 +175,30 @@ int main () {
 
     printf("server: waiting for connections...\n");
 	int pid = -1;
+
     while(1) {  // main accept() loop
         sin_size = sizeof their_addr;
-        new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &sin_size);
+		cout <<"prepare for accept socket "  << endl;
+        //new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &sin_size);
+        new_fd = accept(sockfd, NULL, NULL);
+		cout <<"go for accept socket " << new_fd << endl;
+        //new_fd = accept(sockfd, NULL, NULL);
         //new_fd = accept(sockfd, NULL, NULL);
         if (new_fd == -1) { //socket fd is in non blocking mode p.609
             perror("accept");
-            continue;
+            break;
         }
-		//converts a binary address in network byte order into a text string
+		/*converts a binary address in network byte order into a text string
         inet_ntop(their_addr.ss_family,
             get_in_addr((struct sockaddr *)&their_addr),
             s, sizeof s);
-        printf("server: got connection from %s\n", s);
+        printf("server: got connection from %s\n", s);*/
 		pid = fork();
 		cout <<"pid is " << pid << endl;
         if (!pid) { // this is the child process
 			//need to get data from socket?
 			//char* input = getPacketData(sockfd);
-			cout <<"===== ben 1 =====" << endl;
+			cout <<"===== handle child process =====" << endl;
 			bool start = false;
 			string ans, city, clientID, state, input;
 			char    buf[BUFLEN]; int n = recv(new_fd, buf, BUFLEN, 0);
@@ -222,23 +227,30 @@ int main () {
 				perror("send failed !");
 			} 
 			cout << "Main Server has sent searching result to client "<< clientID <<" using TCP over port " << to_string(p->ai_protocol) << endl;
-			cout << "The Main Server has sent "+city+": Not found” to client " << clientID << " using TCP over port " << to_string(p->ai_protocol) << endl;;
+			cout << "The Main Server has sent "+city+": Not found” to client " << clientID << " using TCP over port " << to_string(p->ai_protocol) << endl;
 
             close(new_fd);
-            exit(0);
+            //exit(0);
+			exit(EXIT_SUCCESS);
         } else if (pid < 0) {
 			perror("fork error");
 			exit(1);
 		} else {
 			/* parent */
+			cout <<"parent turn " << endl;
+            close(new_fd);
+			
 			int status;
-			if ((pid = waitpid(pid, &status, 0)) < 0)
+			if ((pid = waitpid(pid, &status, WNOHANG)) < 0) {
 				perror("waitpid error");
-				exit(1);
+				cout <<"status is " << status << endl;
+				//exit(1);
+			}
 		}
-        close(new_fd);  // parent doesn't need this
+		cout <<"----------- here -------------" << endl;
     }
-
+	cout <<" ===== end of program ==== " << endl;
+	close(new_fd);  // parent doesn't need this
     return 0;
 
 }
