@@ -3,6 +3,7 @@
 #define BUFLEN 128
 using namespace std;
 unordered_map<string, unordered_set<string> >db;
+string stateList;
 void sigchld_handler(int s)
 {
     // waitpid() might overwrite errno, so we save and restore it:
@@ -89,6 +90,7 @@ int main () {
 				db[city].insert(line.substr(0, pos));
 				line.erase(0, pos+1);
 			}
+			db[city].insert(line);
 			odd = true;
 		}
 	}
@@ -96,8 +98,11 @@ int main () {
 	for (auto& it: db) {
 		cout << it.first << ":" << endl;
 		for (string s : it.second) cout << s << endl;
+		stateList+=it.first;
+		stateList+=",";
 		cout << endl;
 	}
+	stateList.pop_back();
 	// Close the file
 	MyReadFile.close();
 
@@ -175,7 +180,7 @@ int main () {
 
     printf("server: waiting for connections...\n");
 	int pid = -1;
-
+	cout <<"Main server is up and running." << endl;
     while(1) {  // main accept() loop
         sin_size = sizeof their_addr;
 		cout <<"prepare for accept socket "  << endl;
@@ -208,6 +213,7 @@ int main () {
 					input.push_back(buf[i]);
 				}
 			}
+
 			cout <<"receive input: " << input << endl;
 			//get city + client id
 			for (int i = 0; i < input.size();i++) {
@@ -215,19 +221,29 @@ int main () {
 				else city.push_back(input[i]);
 				if (input[i] == ',') start = true;
 			}
-			cout <<" ben 2 " << endl;
 			state = findDB(city);
-			if (state.size()) ans = city+" is associated with state "+ state;
-			else ans = city+" not found";
+			bool found = false;
+			if (state.size()) {
+				ans = "City "+ city+" is located in state "+ state + ".";
+				cout << city<<" is associated with state " << state << endl;
+				found = true;
+			} else {
+				ans = city+" not found";
+				cout << city <<" does not show up in states "<<stateList<<endl;
+			}
 			len = ans.size()+1;
 
-			cout << "ans: " << ans << endl;
+			cout << "ans: " << ans <<"  send size is " << len << endl;
             close(sockfd); // child doesn't need the listener
-            if (send(new_fd, &ans, len, 0) == -1) {
+            if (send(new_fd, &ans[0], len, 0) == -1) {
 				perror("send failed !");
 			} 
-			cout << "Main Server has sent searching result to client "<< clientID <<" using TCP over port " << to_string(p->ai_protocol) << endl;
-			cout << "The Main Server has sent "+city+": Not found” to client " << clientID << " using TCP over port " << to_string(p->ai_protocol) << endl;
+			if (found) {
+				cout << "Main Server has sent searching result to client "<< clientID <<" using TCP over port " << to_string(p->ai_protocol) << endl;
+			} else {
+				cout << "The Main Server has sent "+city+": Not found” to client " << clientID << " using TCP over port " << to_string(p->ai_protocol) << endl;
+			}
+			cout << "Main server has received the request on city " << city <<" from client " << clientID <<" using TCP over port "<< to_string(p->ai_protocol) << endl;
 
             close(new_fd);
             //exit(0);
@@ -247,7 +263,6 @@ int main () {
 				//exit(1);
 			}
 		}
-		cout <<"----------- here -------------" << endl;
     }
 	cout <<" ===== end of program ==== " << endl;
 	close(new_fd);  // parent doesn't need this
