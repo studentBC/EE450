@@ -1,0 +1,27 @@
+● Full Name: Lung Chin
+
+● Student ID: lungchin 8928699544
+
+● What you have done in the assignment:
+I wrote a TCP socket for both client and server uses. Once the client socket send out its data, the server socket will fork a child process to deal with the request. After server fulfills client's request, child process will exit and close the socket.
+
+● What your code files are and what each one of them does. (Please do not repeat the project description, just name your code files, and briefly mention what they do).
+There are four files in my folder:
+
+1. client.cpp: sending out the US city message to server and get response from server so that user will know whether this city is in states or not. It will also record client ID once client program is run by another bash by writing a file under its execution directory.
+
+2. servermain.cpp: dealing with request that client sent to it, once it accept request, server will fork a child process to deal with the requirement
+
+3. servermain.h: all socket programming things (all kind of header file, define length) are located here
+
+4. Makefile: for user to compile and run the client and server program
+
+
+● The format of all the messages exchanged.
+The client will send out a message format like "client id,city" to server and the server will response "not found" or <City Name> is associated with state <State Name>. to user.
+
+● Any idiosyncrasy of your project. It should say under what conditions the project fails, if any.
+If user send out a meesage length over 128 bytes, then both server and client will crash. Besides, server program cannot handle a packet that is over 128 bytes.
+
+● Reused Code: Did you use code from anywhere for your project? If not, say so. If so, say what functions and where they're from. (Also identify this with a comment in the source code.)
+I refer to https://beej.us/guide/bgnet/html/#socket and write my client and server socket programming. 

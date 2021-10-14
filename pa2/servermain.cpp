@@ -164,7 +164,7 @@ int main () {
         exit(1);
     }
 
-    printf("server: waiting for connections...\n");
+    //printf("server: waiting for connections...\n");
 	int pid = -1;
 	cout <<"Main server is up and running." << endl;
     while(1) {  // main accept() loop
@@ -194,24 +194,26 @@ int main () {
 			bool start = false;
 			string ans, city, clientID, state, input;
 			char    buf[BUFLEN]; int n = recv(new_fd, buf, BUFLEN, 0);
-			/*if (n) {
-				cout <<"n is " << n << endl;
+			if (n) {
+				//cout <<"n is " << n << endl;
 				for (int i = 0; i < n; i++) {
 					input.push_back(buf[i]);
 				}
 			}
 
-			cout <<"receive input: " << input << endl;*/
+			//cout <<"receive input: " << input << endl;
 			//get city + client id
 			for (int i = 0; i < input.size();i++) {
 				if (!start) clientID.push_back(input[i]);
 				else city.push_back(input[i]);
 				if (input[i] == ',') start = true;
 			}
+			string portNumber = to_string(ntohs(clinetAddr.sin_port));
+			cout << "Main server has received the request on city " << city <<" from client " << clientID <<" using TCP over port "<< portNumber << endl;
 			state = findDB(city);
 			bool found = false;
 			if (state.size()) {
-				ans = "City "+ city+" is located in state "+ state + ".";
+				ans = "City "+ city+" is associated with state "+ state + ".";
 				cout << city<<" is associated with state " << state << endl;
 				found = true;
 			} else {
@@ -234,15 +236,13 @@ int main () {
 			*/ 
 
 			//string portNumber = to_string(ntohs(sin.sin_port));
-			string portNumber = to_string(ntohs(clinetAddr.sin_port));
 			//string portNumber = to_string(ntohs(((struct sockaddr_in *)p->ai_addr)->sin_port));
 			if (found) {
 				cout << "Main Server has sent searching result to client "<< clientID <<" using TCP over port " << portNumber << endl;
 			} else {
-				cout << "The Main Server has sent "+city+": Not found” to client " << clientID << " using TCP over port " << portNumber << endl;
+				cout << "The Main Server has sent "+city+": Not found to client " << clientID << " using TCP over port " << portNumber << endl;
 			}
-			cout << "Main server has received the request on city " << city <<" from client " << clientID <<" using TCP over port "<< portNumber << endl;
-
+			cout << endl;
             close(new_fd);
             //exit(0);
 			exit(EXIT_SUCCESS);

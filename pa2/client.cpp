@@ -65,7 +65,6 @@ int main()
 	while(1) {
 		cout << "Enter City Name:" << endl;
 		getline(cin, input);
-		cout << "Client has sent city "<< input << " to Main Server using TCP ." << endl;
 
 		// loop through all the results and connect to the first we can
 		for(p = servinfo; p != NULL; p = p->ai_next) {
@@ -101,12 +100,12 @@ int main()
 		char sent[128];
 		for (int i = 0; i < rawdata.size(); i++) sent[i] = rawdata[i];
 		send(sockfd , sent, rawdata.size(), 0 );
+		cout << "Client has sent city "<< input << " to Main Server using TCP ." << endl;
 		struct sockaddr_in  *sinp = (struct sockaddr_in *)p->ai_addr;
 		
-		cout <<"Main server has received the request on city "+input+" from client "+ clientID +" using TCP over port "<< ntohs(sinp->sin_port) << endl;
-
     	char buf[MAXDATASIZE];
 		numbytes = recv(sockfd, buf, MAXDATASIZE, 0);
+		cout <<"Main server has received the request on city "+input+" from client "+ clientID +" using TCP over port "<< ntohs(sinp->sin_port) << endl;
 		string s (buf);
 		//cout <<"receive msg is " << buf <<" packet length is " << numbytes << endl;
 		if (numbytes < 0) {
