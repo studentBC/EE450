@@ -33,21 +33,6 @@ void *get_in_addr(struct sockaddr *sa)
     return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
 
-/*
-char* getPacketData (int sockfd) {
-   int     n;
-   char* buf = new char[BUFLEN];
-   cout <<"===========================" << endl;
-   if (n = recv(sockfd, buf, BUFLEN, 0) > 0) {
-		for (int i = 0; i < n; i++) cout << buf[i];
-   }
-   if (n < 0) {
-	   perror("recv error");
-   		exit(1);
-   }
-   return buf;
-}*/
-
 string findDB (string city) {
 	for (auto& it: db) {
 		if (db[it.first].count(city)) return it.first;
@@ -78,7 +63,7 @@ int main () {
 	bool odd = true;
 	// Read from the text file
 	ifstream MyReadFile("list.txt");
-	cout <<"Upon reading the state lists:" << endl;
+	cout <<"Main server has read the state list from list.txt." << endl;
 	string line, city;
 	while (getline (MyReadFile, line)) {
 		if (odd) {
@@ -158,6 +143,7 @@ int main () {
         break;
     }
 
+	//cout <<"***  portNumber " << to_string(ntohs(((struct sockaddr_in *)servinfo->ai_addr)->sin_port)) << "     ***"   <<endl;
     freeaddrinfo(servinfo); // all done with this structure
 
     if (p == NULL)  {
@@ -182,10 +168,11 @@ int main () {
 	int pid = -1;
 	cout <<"Main server is up and running." << endl;
     while(1) {  // main accept() loop
-        sin_size = sizeof their_addr;
+		struct sockaddr_in clinetAddr;
+        //sin_size = sizeof clinetAddr;
 		cout <<"prepare for accept socket "  << endl;
-        //new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &sin_size);
-        new_fd = accept(sockfd, NULL, NULL);
+        new_fd = accept(sockfd, (struct sockaddr *)&clinetAddr, &sin_size);
+        //new_fd = accept(sockfd, NULL, NULL);
 		cout <<"go for accept socket " << new_fd << endl;
         //new_fd = accept(sockfd, NULL, NULL);
         //new_fd = accept(sockfd, NULL, NULL);
@@ -233,17 +220,28 @@ int main () {
 			}
 			len = ans.size()+1;
 
-			cout << "ans: " << ans <<"  send size is " << len << endl;
             close(sockfd); // child doesn't need the listener
+			cout << "ans: " << ans <<"  send size is " << len << endl;
             if (send(new_fd, &ans[0], len, 0) == -1) {
 				perror("send failed !");
-			} 
-			if (found) {
-				cout << "Main Server has sent searching result to client "<< clientID <<" using TCP over port " << to_string(p->ai_protocol) << endl;
-			} else {
-				cout << "The Main Server has sent "+city+": Not found” to client " << clientID << " using TCP over port " << to_string(p->ai_protocol) << endl;
 			}
-			cout << "Main server has received the request on city " << city <<" from client " << clientID <<" using TCP over port "<< to_string(p->ai_protocol) << endl;
+			/*get dynmic port number
+			struct sockaddr_in sin;
+			socklen_t len = sizeof(sin);
+			if (getsockname(new_fd, (struct sockaddr *)&sin, &len) == -1)
+				perror("getsockname");
+			else printf("port number %d\n", ntohs(sin.sin_port));
+			*/ 
+
+			//string portNumber = to_string(ntohs(sin.sin_port));
+			string portNumber = to_string(ntohs(clinetAddr.sin_port));
+			//string portNumber = to_string(ntohs(((struct sockaddr_in *)p->ai_addr)->sin_port));
+			if (found) {
+				cout << "Main Server has sent searching result to client "<< clientID <<" using TCP over port " << portNumber << endl;
+			} else {
+				cout << "The Main Server has sent "+city+": Not found” to client " << clientID << " using TCP over port " << portNumber << endl;
+			}
+			cout << "Main server has received the request on city " << city <<" from client " << clientID <<" using TCP over port "<< portNumber << endl;
 
             close(new_fd);
             //exit(0);
