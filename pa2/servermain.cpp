@@ -170,10 +170,10 @@ int main () {
     while(1) {  // main accept() loop
 		struct sockaddr_in clinetAddr;
         //sin_size = sizeof clinetAddr;
-		cout <<"prepare for accept socket "  << endl;
+		//cout <<"prepare for accept socket "  << endl;
         new_fd = accept(sockfd, (struct sockaddr *)&clinetAddr, &sin_size);
         //new_fd = accept(sockfd, NULL, NULL);
-		cout <<"go for accept socket " << new_fd << endl;
+		//cout <<"go for accept socket " << new_fd << endl;
         //new_fd = accept(sockfd, NULL, NULL);
         //new_fd = accept(sockfd, NULL, NULL);
         if (new_fd == -1) { //socket fd is in non blocking mode p.609
@@ -186,22 +186,22 @@ int main () {
             s, sizeof s);
         printf("server: got connection from %s\n", s);*/
 		pid = fork();
-		cout <<"pid is " << pid << endl;
+		//cout <<"pid is " << pid << endl;
         if (!pid) { // this is the child process
 			//need to get data from socket?
 			//char* input = getPacketData(sockfd);
-			cout <<"===== handle child process =====" << endl;
+			//cout <<"===== handle child process =====" << endl;
 			bool start = false;
 			string ans, city, clientID, state, input;
 			char    buf[BUFLEN]; int n = recv(new_fd, buf, BUFLEN, 0);
-			if (n) {
+			/*if (n) {
 				cout <<"n is " << n << endl;
 				for (int i = 0; i < n; i++) {
 					input.push_back(buf[i]);
 				}
 			}
 
-			cout <<"receive input: " << input << endl;
+			cout <<"receive input: " << input << endl;*/
 			//get city + client id
 			for (int i = 0; i < input.size();i++) {
 				if (!start) clientID.push_back(input[i]);
@@ -221,7 +221,7 @@ int main () {
 			len = ans.size()+1;
 
             close(sockfd); // child doesn't need the listener
-			cout << "ans: " << ans <<"  send size is " << len << endl;
+			//cout << "ans: " << ans <<"  send size is " << len << endl;
             if (send(new_fd, &ans[0], len, 0) == -1) {
 				perror("send failed !");
 			}
@@ -251,7 +251,7 @@ int main () {
 			exit(1);
 		} else {
 			/* parent */
-			cout <<"parent turn " << endl;
+			//cout <<"parent turn " << endl;
             close(new_fd);
 			
 			int status;
@@ -262,7 +262,7 @@ int main () {
 			}
 		}
     }
-	cout <<" ===== end of program ==== " << endl;
+	//cout <<" ===== end of program ==== " << endl;
 	close(new_fd);  // parent doesn't need this
     return 0;
 

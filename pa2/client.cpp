@@ -31,13 +31,13 @@ string getClientID() {
   if (myfile.is_open())
   {
 	  getline (myfile,line);
-	  cout << line << '\n';
+	  //cout << line << '\n';
 	  stringstream ss(line);
 	  ss >> count;
   }
     myfile.close();
 	count++;
-	cout << count << endl;
+	//cout << count << endl;
   return to_string(count);	
 }
 
@@ -98,7 +98,9 @@ int main()
 
 
 		string rawdata = clientID+","+input;
-		send(sockfd , &rawdata, rawdata.size()+1, 0 );
+		char sent[128];
+		for (int i = 0; i < rawdata.size(); i++) sent[i] = rawdata[i];
+		send(sockfd , sent, rawdata.size(), 0 );
 		struct sockaddr_in  *sinp = (struct sockaddr_in *)p->ai_addr;
 		
 		cout <<"Main server has received the request on city "+input+" from client "+ clientID +" using TCP over port "<< ntohs(sinp->sin_port) << endl;
