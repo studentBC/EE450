@@ -23,7 +23,7 @@ int getSocket (string port) {
 	cout << "Client is up and running." << endl;
 	memset(&hints, 0, sizeof hints);
 	hints.ai_family = AF_UNSPEC;//either ipv4 or ipv6 internet domain
-	hints.ai_socktype = SOCK_STREAM;// for TCP usage
+	hints.ai_socktype = SOCK_DGRAM;// for UDP usage
 	hints.ai_protocol = IPPROTO_UDP; //use UDP
 	if ((rv = getaddrinfo("127.0.0.1", &port[0], &hints, &servinfo)) != 0) {
 		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
@@ -38,7 +38,7 @@ int getSocket (string port) {
 			perror("client: socket");
 			continue;
 		}
-
+		cout <<"---- 41 ----" << endl;
 		if (connect(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
 			close(sockfd);
 			perror("client: connect");
@@ -47,7 +47,7 @@ int getSocket (string port) {
 
 		break;
 	}
-
+	cout <<"---- 50 ----" <<endl;
 	if (p == NULL) {
 		fprintf(stderr, "client: failed to connect\n");
 		return 2;
@@ -67,10 +67,13 @@ int main()
 		sockfdA = getSocket("30544");
 		char sent[128];
 		sent[0] = '$';
+		cout <<"--- 70 ---"<<endl;
 		send(sockfdA , sent, 2, 0 );
+		cout <<"--- 72 ---"<<endl;
 		char buf[MAXDATASIZE];
 		do {
 			numbytes = recv(sockfdA, buf, MAXDATASIZE, 0);
+			cout <<"numbytes: " << numbytes<<endl;
 			if (numbytes < 0) {
 				cout <<"---------- recevie error -----------" << endl;
 				perror("recv");
@@ -78,14 +81,20 @@ int main()
 				close(sockfdA);
 				exit(1);
 			}
-			string state(buf);
-			db[state] = "30544";
+			string state = "";
+			numbytes--;
+			for (int i = 0; i < numbytes; i++) state.push_back(buf[i]);
+			cout << state << endl;
+			if (state[0]!='$') db[state] = "30544";
 		} while(buf[0]!='$');
+		cout <<"--- 87 ---"<<endl;
 		cout<<"Main server has received the state list from server A using UDP over port 32544"<<endl;
 		cout <<"--------- lets start to process server B ----------" << endl;
 		sockfdB = getSocket("31544");
+		cout <<"get out "<<endl;
 		do {
 			numbytes = recv(sockfdB, buf, MAXDATASIZE, 0);
+			cout <<"B numbytes: " << numbytes << endl;
 			if (numbytes < 0) {
 				cout <<"---------- recevie error -----------" << endl;
 				perror("recv");
@@ -95,12 +104,16 @@ int main()
 			}
 			string state(buf);
 			db[state] = "31544";
+			cout <<"B numbytes: " << numbytes << endl;
 		} while(buf[0]!='$');
 		cout<<"Main server has received the state list from server B using UDP over port 32544"<<endl;
 	}
 	cout <<"Server A"<<endl;
 	for (auto& it: db) {
-		if (it.second == "30544") cout << it.first <<endl;
+		if (it.second == "30544") {
+			cout << it.first<< endl;
+			cout << it.first.size() <<endl;
+		}
 	}
 	
 	cout <<endl<<"Server B"<<endl;
@@ -113,16 +126,21 @@ int main()
 		cout << "Enter state name:" << endl;
 		getline(cin, input);
 
-		if (!db.count(input)) {
-			cout <<"does not show up in server A&B"<<endl;
+		if (db.find(input) == db.end()) {
+			cout << input<<" does not show up in server A&B"<<endl;
+			cout <<db[input] << endl;
 			continue;
 		}
-		if (db[input] == "30544") sname = "A";
-		else sname = "B";
+		if (db[input] == "30544") {
+			sname = "A";
+			sockfd = sockfdA;
+		} else {
+			sname = "B";
+			sockfd = sockfdB;
+		}
 		cout << input <<" shows up in server "<< sname<<endl;
 
 		count = 0;
-		sockfd = stoi(db[input]);
 		send(sockfd , &input[0], input.size()+1, 0 );
 
 		if (db.count(input)) cout <<"The Main Server has sent request for "<<input<<" to server A using UDP over port 30544"<<endl;
@@ -132,6 +150,7 @@ int main()
 		char buf[MAXDATASIZE];
 		string ans;
 		do {
+			cout << "sent to " << sockfd << endl;
 			numbytes = recv(sockfd, buf, MAXDATASIZE, 0);
 			if (numbytes < 0) {
 				cout <<"---------- recevie error -----------" << endl;
@@ -140,8 +159,9 @@ int main()
 				close(sockfd);
 				exit(1);
 			}
-			count++;
 			string state(buf);
+			if (state[0] == '$') break;
+			count++;
 			ans+=state;
 			ans+=", ";
 		} while(buf[0]!='$');

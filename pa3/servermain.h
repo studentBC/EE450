@@ -23,6 +23,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
+#include <string.h>
 //main server port number hardcode but customer should not
 //don't terminate client automatically
 //create child process
