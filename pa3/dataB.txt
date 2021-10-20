@@ -1,0 +1,18 @@
+Alabama
+Birmingham,Florence,Marion,Scottsboro,Tuscaloosa
+Wisconsin
+Ashland,Baraboo,Green Bay,Madison,Oshkosh
+Wyoming
+Cheyenne
+Virginia
+Alexandria,Bristol,Charlottesville,Lexington,Richmond,Roanoke
+Washington
+Aberdeen,Bellingham,Oak Harbor,Olympia,Seattle,Spokane,Tacoma
+South Dakota
+Pierre
+Ohio
+Akron,Cincinnati,Cleveland,Toledo,Youngstown
+Oklahoma
+Ada,Chickasha,Oklahoma City,Tulsa
+California
+Anaheim,Los Angeles,Arcadia,Burbank,Concord,El Centro,Fairfield,Fremont,Fullerton,Glendale,Inglewood,Irvine,Long Beach,Los Angeles,Malibu,Napa,Martinez,Marysville,Menlo Park,Merced,Oakland,Oceanside,Ojai,Palo Alto,Pasadena,San Diego,San Fernando,San Francisco,San Gabriel,Santa Cruz

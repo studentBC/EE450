@@ -1,0 +1,18 @@
+Colorado
+Alamosa,Aspen,Aurora,Boulder,Brighton,Canon City,Central City,Colorado Springs
+Arizona
+Phoenix,Bisbee,Casa Grande,Chandler,Flagstaff,Glendale,Tucson,Phoenix
+Georgia
+Americus,Andersonville,Athens,Atlanta,Calhoun,Carrollton,Columbus,Dahlonega,Dalton,Darien,Decatur,Douglas,East Point,Fitzgerald,Fort Valley,Gainesville,La Grange,Macon,Marietta,Milledgeville,Plains,Rome,Savannah
+Hawaii
+Hanalei,Hilo,Honaunau,Honolulu,Kahului,Kaneohe,Wahiawa,Wailuku
+Kansas
+Arkansas City,Atchison,Garden City,Ottawa,Topeka,Wichita
+Kentucky
+Ashland,Barbourville,Bardstown,Bowling Green,Lexington,Louisville
+Louisiana
+Abbeville,Bastrop,Baton Rouge,Lafayette,Monroe,New Orleans
+Maine
+Auburn,Augusta,Bangor,Bar Harbor,Brunswick,Farmington
+Indiana
+Anderson,Bedford,Bloomington,Connersville,Crawfordsville,East Chicago,Elkhart,Fort Wayne
