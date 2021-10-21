@@ -1,0 +1,28 @@
+• Full Name: Lung Chin
+
+• Student ID: lungchin
+
+• Briefly summarize what you have done in the assignment.
+	what I do in this assignment is that I wrote a backup server which can be connected by UDP socket. It will read input data first then it will send all states data to mainserver one by one (one packet for one state). Besides, backup server can also send out the city datas which are located under certain state that user required.
+	For mainserver, it can use UDP socket to send to and receive from backup server. Briefly speaking, mainserver will ask state list from A, B backup server when it start up by sending '$'. After that it will enter an infinite loop for user to enter the state which they want to search. If the state is on the lists then mainserver will send to corresponding backup server. Otherwise, it will response not found to user.
+
+• List all your code files and briefly summarize their fulfilled functionalities. (Please
+do not repeat the project description).
+
+serverA, serverB: they can handle search request sent by mainserver. They will send all state data to mainserver once mainserver starts
+
+mainserver: it can let user to enter state name to look up which cities are in that state. It will ask serverA, B to send it all state data once it starts and store it in its own memory.
+
+• The format of all the messages exchanged between servers.
+
+mainserver sent '$' as request state list singal. After that it will simply send out state name to backup server for them to look up cities in certain state
+
+serverA, B sent '$' as finished signal to mainserver symboling that they complete sending all datas to mainserver.
+
+• Any idiosyncrasy of your project. It should say under what conditions the project
+fails, if any.
+No
+
+• Reused Code: Did you use code from anywhere for your project? If not, say so. If
+so, say what functions and where they're from. (Also identify this with a comment in the source code.)
+I only use small part of my previous pa2 code
