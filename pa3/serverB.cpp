@@ -19,7 +19,6 @@ int main () {
 	string key = "";
 	// Read from the text file
 	ifstream MyReadFile("dataB.txt");
-	cout <<"Main server has read the state list from list.txt." << endl;
 	string line, city;
 	while (getline (MyReadFile, line)) {
 		if (odd) {
@@ -40,11 +39,12 @@ int main () {
 			odd = true;
 		}
 	}
-	for (auto& it: db) {
+	cout <<"Server B is up and running using UDP on port 31544" << endl;
+	/*for (auto& it: db) {
 		cout << it.first << endl;
 		for (string s : it.second) cout << s <<" => ";;
 		cout << endl;
-	}
+	}*/
 	stateList.pop_back();
 	// Close the file
 	MyReadFile.close();
@@ -96,18 +96,19 @@ int main () {
 				sendto(sockfd, &it.first[0], it.first.size()+1, 0, (const struct sockaddr *) &cliaddr, (socklen_t)len);
 			}
 			sendto(sockfd, "$", 2, 0, (const struct sockaddr *) &cliaddr, (socklen_t)len);
+			cout <<"Server B has sent a state list to Main Server"<<endl;
 			continue;
 		}
-		printf("Client : %s\n", buffer);
 		key = "";
 		n--;
 		for (int i = 0; i < n; i++) key.push_back(buffer[i]);
-		cout <<"its length: " << n << endl;
-		cout <<"key is " << key << endl;
+		//cout <<"its length: " << n << endl;
+		//cout <<"key is " << key << endl;
 		//for (string s: db[key]) cout << s <<" -> ";
-		//cout << endl;
+		cout<<"Server B has received a request for "<< key << endl;
+		cout <<"Server B found "<<  db[key].size() <<" distinct cities for " << key <<":"<<endl;
 		for (string s: db[key]) {
-			cout << s << " , ";
+			cout << s << ",";
 			if (sendto(sockfd, &s[0], s.size()+1, 0, (const struct sockaddr *) &cliaddr, (socklen_t)len) < 0) {
 				perror("sending error ");
 				close(sockfd);
@@ -116,7 +117,7 @@ int main () {
 		}
 		cout << endl;
 		sendto(sockfd, "$", 2, 0, (const struct sockaddr *) &cliaddr, (socklen_t)len);
-		printf("Hello message sent.\n");
+		cout <<"Server B has sent the results to Main Server"<<endl;
 	}
     return 0;
 
