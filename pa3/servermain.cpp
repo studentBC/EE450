@@ -20,6 +20,7 @@ int getSocket (string port) {
 		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
 		return 1;
 	}
+	//we should use addrinfo and bind the socket port
 	//we should get state list first by sending '$'
 	// loop through all the results and connect to the first we can
 	for(p = servinfo; p != NULL; p = p->ai_next) {
@@ -155,9 +156,9 @@ int main()
 		} while(buf[0]!='$');
 		cout <<"The Main server has received searching results of "<< input <<" from server " << sname <<endl;
 		ans.pop_back();
-		ans+=".";
-		cout <<"There are "<<count<<" distinct cities in Indiana. Their names are" << endl;
-		cout << ans<< endl;
+		//cout << ans<< endl;
+		cout <<endl << "There are "<<count<<" distinct cities in Indiana. Their names are" << endl;
+		cout << ans << endl;
 		cout <<endl<<"-----Start a new query-----" << endl;
 	}
 
