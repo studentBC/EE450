@@ -2,70 +2,66 @@
 
 using namespace std;
 #define MAXDATASIZE 128
-
 unordered_map<string,string>db;
-int getSocket (string port) {
-    int sockfd, numbytes;  
-    struct addrinfo hints, *servinfo, *p;
-    int rv;
-    char s[INET6_ADDRSTRLEN]= "127.0.0.1";; 
-	string input = "", clientID = "";
-	//read user input
-	//cout << "Main server is up and running." << endl;
-	memset(&hints, 0, sizeof hints);
-	hints.ai_family = AF_UNSPEC;//either ipv4 or ipv6 internet domain
-	hints.ai_socktype = SOCK_DGRAM;// for UDP usage
-	hints.ai_protocol = IPPROTO_UDP; //use UDP
-	if ((rv = getaddrinfo("127.0.0.1", &port[0], &hints, &servinfo)) != 0) {
-		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
-		return 1;
-	}
-	//we should use addrinfo and bind the socket port
-	//we should get state list first by sending '$'
-	// loop through all the results and connect to the first we can
-	for(p = servinfo; p != NULL; p = p->ai_next) {
-		//cout <<p->ai_family <<" socket type: " << p->ai_socktype <<" protocol: " << p->ai_protocol << endl;
-		if ((sockfd = socket(p->ai_family, p->ai_socktype,
-				p->ai_protocol)) == -1) {
-			perror("client: socket");
-			continue;
-		}
-		if (connect(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
-			close(sockfd);
-			perror("client: connect");
-			continue;
-		}
 
-		break;
-	}
-	if (p == NULL) {
-		fprintf(stderr, "client: failed to connect\n");
-		return 2;
-	}
-	return sockfd;
-}
 
 int main()
 {
-    int sockfd, sockfdA, sockfdB, numbytes;  
+    int sockfd, numbytes;  
     struct addrinfo hints, *servinfo, *p;
     int rv, count;
+	socklen_t  alen;
+	uint32_t destPort;  
+	struct sockaddr_in destAddr, serverAddr;
+	destAddr.sin_family = AF_INET;
+	destAddr.sin_port = htons(30544);
+	inet_aton("127.0.0.1", &(destAddr.sin_addr));
+	alen = sizeof(destAddr);
+	/*
+	struct sockaddr *destAddr = new struct sockaddr;
+	destAddr->sa_family = AF_INET;
+	destAddr->sa_addr = 
+	*/
     char s[INET6_ADDRSTRLEN]= "127.0.0.1";; 
 	string input = "", clientID = "", sname = "";
 	cout <<"Main server is up and running."<<endl;
+
+
+	if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
+		perror("UDP Socket Create Error");
+		exit(1);
+	}
+
+	memset(&serverAddr, 0, sizeof serverAddr);
+	memset(serverAddr.sin_zero, '\0', sizeof serverAddr.sin_zero);
+	serverAddr.sin_family = AF_INET;
+	serverAddr.sin_port = htons(32544);
+	serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+	// bind the socket with udp server address
+	if (bind(sockfd, (struct sockaddr*) &serverAddr, sizeof serverAddr ) < 0) exit(1);
+	//for debug
+	struct sockaddr_in sin;
+	socklen_t len = sizeof(sin);
+	if (getsockname(sockfd, (struct sockaddr *)&sin, &len) == -1) perror("getsockname");
+	else printf("port number %d\n", ntohs(sin.sin_port));
+	/*	perror("UDP Bind Error");
+		exit(1);
+	}*/
+
 	if (db.empty()) {
-		sockfdA = getSocket("30544");
 		char sent[128];
 		sent[0] = '$';
-		send(sockfdA , sent, 2, 0 );
+		destAddr.sin_port = htons(30544);
+		//sendto(sockfd , &sent, 2, 0,  &destAddr, alen);
+		sendto(sockfd , &sent, 2, 0,  (struct sockaddr*)&destAddr, (socklen_t)sizeof(destAddr));
 		char buf[MAXDATASIZE];
 		do {
-			numbytes = recv(sockfdA, buf, MAXDATASIZE, 0);
+			numbytes = recvfrom(sockfd, buf, MAXDATASIZE, 0, (struct sockaddr*)&destAddr, &alen);
 			if (numbytes < 0) {
 				cout <<"---------- recevie error -----------" << endl;
 				perror("recv");
 				freeaddrinfo(servinfo); // all done with this structure
-				close(sockfdA);
+				close(sockfd);
 				exit(1);
 			}
 			string state = "";
@@ -76,16 +72,16 @@ int main()
 		} while(buf[0]!='$');
 		cout<<"Main server has received the state list from server A using UDP over port 32544"<<endl;
 		//cout <<"--------- lets start to process server B ----------" << endl;
-		sockfdB = getSocket("31544");
-		send(sockfdB , sent, 2, 0 );
+		destAddr.sin_port = htons(31544);
+		sendto(sockfd , sent, 2, 0,  (struct sockaddr*)&destAddr, (socklen_t)sizeof(destAddr));
 		do {
-			numbytes = recv(sockfdB, buf, MAXDATASIZE, 0);
+			numbytes = recvfrom(sockfd, buf, MAXDATASIZE, 0, (struct sockaddr*)&destAddr, &alen);
 			//cout <<"numbytes: " << numbytes<<endl;
 			if (numbytes < 0) {
 				cout <<"---------- recevie error -----------" << endl;
 				perror("recv");
 				freeaddrinfo(servinfo); // all done with this structure
-				close(sockfdB);
+				close(sockfd);
 				exit(1);
 			}
 			string state = "";
@@ -123,15 +119,17 @@ int main()
 		}
 		if (db[input] == "30544") {
 			sname = "A";
-			sockfd = sockfdA;
+			destPort = 30544;
 		} else {
 			sname = "B";
-			sockfd = sockfdB;
+			destPort = 31544;
 		}
 		cout << input <<" shows up in server "<< sname<<endl;
 
 		count = 0;
-		send(sockfd , &input[0], input.size()+1, 0 );
+		destAddr.sin_port = htons(destPort);
+		//sendto(sockfd , sent, 2, 0,  &destAddr, alen);
+		sendto(sockfd , &input[0], input.size()+1, 0, (struct sockaddr*)&destAddr, (socklen_t)sizeof(destAddr));
 
 		if (db.count(input)) cout <<"The Main Server has sent request for "<<input<<" to server A using UDP over port 30544"<<endl;
 		else cout <<"The Main Server has sent request for "<<input<<" to server B using UDP over port 31544"<<endl;
@@ -139,8 +137,9 @@ int main()
 		char buf[MAXDATASIZE];
 		string ans;
 		do {
+			numbytes = recvfrom(sockfd, buf, MAXDATASIZE, 0, (struct sockaddr*)&destAddr, &alen);
 			//cout << "sent to " << sockfd << endl;
-			numbytes = recv(sockfd, buf, MAXDATASIZE, 0);
+			//numbytes = recv(sockfd, buf, MAXDATASIZE, 0);
 			if (numbytes < 0) {
 				cout <<"---------- recevie error -----------" << endl;
 				perror("recv");
