@@ -38,7 +38,9 @@ int main()
 	serverAddr.sin_port = htons(32544);
 	serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 	// bind the socket with udp server address
-	if (bind(sockfd, (struct sockaddr*) &serverAddr, sizeof serverAddr ) < 0) exit(1);
+	int L = sizeof(serverAddr);
+	int res = bind(sockfd, (const struct sockaddr*) &serverAddr, (socklen_t)L); 
+	if (res < 0) exit(1);
 	//for debug
 	struct sockaddr_in sin;
 	socklen_t len = sizeof(sin);
