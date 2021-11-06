@@ -133,7 +133,7 @@ int main()
 		//sendto(sockfd , sent, 2, 0,  &destAddr, alen);
 		sendto(sockfd , &input[0], input.size()+1, 0, (struct sockaddr*)&destAddr, (socklen_t)sizeof(destAddr));
 
-		if (db.count(input)) cout <<"The Main Server has sent request for "<<input<<" to server A using UDP over port 30544"<<endl;
+		if (sname == "A") cout <<"The Main Server has sent request for "<<input<<" to server A using UDP over port 30544"<<endl;
 		else cout <<"The Main Server has sent request for "<<input<<" to server B using UDP over port 31544"<<endl;
 
 		char buf[MAXDATASIZE];
