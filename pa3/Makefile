@@ -8,8 +8,10 @@ all:
 	$(PP) -std=$(version) -o serverB.out serverB.cpp
 servermain:
 	$(PP) -std=$(version) -o servermain.out servermain.cpp 
-client:
-	$(PP) -std=$(version) -o client.out client.cpp
+serverA:
+	$(PP) -std=$(version) -o serverA.out serverA.cpp
+serverB:
+	$(PP) -std=$(version) -o serverB.out serverB.cpp
 
 clear:
 	rm *.out

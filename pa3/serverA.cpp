@@ -107,15 +107,21 @@ int main () {
 		//for (string s: db[key]) cout << s <<" -> ";
 		cout<<"Server A has received a request for "<< key << endl;
 		cout <<"Server A found "<<  db[key].size() <<" distinct cities for " << key <<":"<<endl;
+		string reply = "";
+		for (auto& it: db[key]) {
+			reply+= it;
+			reply.push_back(',');
+		}
 		for (string s: db[key]) {
-			cout << s << ",";
+			//cout << s << ",";
 			if (sendto(sockfd, &s[0], s.size()+1, 0, (const struct sockaddr *) &cliaddr, (socklen_t)len) < 0) {
 				perror("sending error ");
 				close(sockfd);
 				exit(EXIT_FAILURE);
 			}
 		}
-		cout << endl;
+		reply.pop_back();
+		cout << reply << endl;
 		sendto(sockfd, "$", 2, 0, (const struct sockaddr *) &cliaddr, (socklen_t)len);
 		cout <<"Server A has sent the results to Main Server"<<endl;
 	}

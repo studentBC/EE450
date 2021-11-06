@@ -103,19 +103,22 @@ int main () {
 		n--;
 		for (int i = 0; i < n; i++) key.push_back(buffer[i]);
 		//cout <<"its length: " << n << endl;
-		//cout <<"key is " << key << endl;
-		//for (string s: db[key]) cout << s <<" -> ";
+		string reply = ""; 
+		for (auto& it: db[key]) {
+			reply+=it;
+			reply.push_back(',');
+		}
 		cout<<"Server B has received a request for "<< key << endl;
 		cout <<"Server B found "<<  db[key].size() <<" distinct cities for " << key <<":"<<endl;
 		for (string s: db[key]) {
-			cout << s << ",";
 			if (sendto(sockfd, &s[0], s.size()+1, 0, (const struct sockaddr *) &cliaddr, (socklen_t)len) < 0) {
 				perror("sending error ");
 				close(sockfd);
 				exit(EXIT_FAILURE);
 			}
 		}
-		cout << endl;
+		reply.pop_back();
+		cout << reply << endl;
 		sendto(sockfd, "$", 2, 0, (const struct sockaddr *) &cliaddr, (socklen_t)len);
 		cout <<"Server B has sent the results to Main Server"<<endl;
 	}
