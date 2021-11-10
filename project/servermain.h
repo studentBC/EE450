@@ -25,4 +25,4 @@
 #include <netdb.h>
 #include <string.h>
 #define serverPort "33544"
-
+#define BUFLEN 128

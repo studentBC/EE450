@@ -60,7 +60,7 @@ void processData(string filename) {
 int main () {
 	bool turn = true;
 	string key = "", userID;
-	processData("dataA.txt");	
+	processData("dataB.txt");	
 	int sockfd;
     char buffer[MAXLINE];
     struct sockaddr_in servaddr, cliaddr;
@@ -108,7 +108,7 @@ int main () {
 			for (auto& it: prepareToSend) {
 				sendto(sockfd, &it.first[0], it.first.size()+1, 0, (const struct sockaddr *) &cliaddr, (socklen_t)len);
 				for (auto& s : it.second) {
-					sendto(sockfd, &s, s.size()+1, 0, (const struct sockaddr *) &cliaddr, (socklen_t)len);
+					sendto(sockfd, &s[0], s.size()+1, 0, (const struct sockaddr *) &cliaddr, (socklen_t)len);
 				}
 			}
 			sendto(sockfd, "$", 2, 0, (const struct sockaddr *) &cliaddr, (socklen_t)len);
@@ -126,8 +126,7 @@ int main () {
 				else key.push_back(buffer[i]);
 			}
 		}
-		cout<<"Server B has received a request for "<< key << endl;
-		cout <<"Server B found the following possible friends for "<<  userID <<" in " << key <<":"<<endl;
+		cout<<"Server B has received a request for finding possible friends of User "<< userID<<" in "<< key << endl;
 		if (!(db.count(key) && db[key].count(userID))) {
 			cout <<"User " << userID <<" does not show up in " << key << endl;
 			//# means that we cannot find the corresponding userID here
@@ -139,6 +138,7 @@ int main () {
 		//cout <<"key is " << key << endl;
 		//for (string s: db[key]) cout << s <<" -> ";
 		string reply = "";
+		cout <<"Server B found the following possible friends for User "<<  userID <<" in " << key <<": ";
 		for (auto& it: db[key][userID]) {
 			reply+= it;
 			reply.push_back(',');

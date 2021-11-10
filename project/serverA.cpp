@@ -108,8 +108,10 @@ int main () {
 			for (auto& it: prepareToSend) {
 				sendto(sockfd, &it.first[0], it.first.size()+1, 0, (const struct sockaddr *) &cliaddr, (socklen_t)len);
 				for (auto& s : it.second) {
-					sendto(sockfd, &s, s.size()+1, 0, (const struct sockaddr *) &cliaddr, (socklen_t)len);
+					cout << s << " : " << s.size() << endl;
+					sendto(sockfd, &s[0], s.size()+1, 0, (const struct sockaddr *) &cliaddr, (socklen_t)len);
 				}
+				//cout << endl;
 			}
 			sendto(sockfd, "$", 2, 0, (const struct sockaddr *) &cliaddr, (socklen_t)len);
 			cout <<"Server A has sent a state list to Main Server"<<endl;
@@ -126,8 +128,7 @@ int main () {
 				else key.push_back(buffer[i]);
 			}
 		}
-		cout<<"Server A has received a request for "<< key << endl;
-		cout <<"Server A found the following possible friends for "<<  userID <<" in " << key <<":"<<endl;
+		cout<<"Server A has received a request for finding possible friends of User "<< userID<<" in "<< key << endl;
 		if (!(db.count(key) && db[key].count(userID))) {
 			cout <<"User " << userID <<" does not show up in " << key << endl;
 			//# means that we cannot find the corresponding userID here
@@ -139,6 +140,7 @@ int main () {
 		//cout <<"key is " << key << endl;
 		//for (string s: db[key]) cout << s <<" -> ";
 		string reply = "";
+		cout <<"Server A found the following possible friends for User "<<  userID <<" in " << key <<": ";
 		for (auto& it: db[key][userID]) {
 			reply+= it;
 			reply.push_back(',');
