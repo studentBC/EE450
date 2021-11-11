@@ -289,22 +289,22 @@ int main()
 					else clientID.push_back(c);
 				}
 			}
-			cout <<"Main server has received the request on User "<<userID <<" in "<< state <<" from client "<<clientID <<" using TCP over port ???" << endl;
+			cout <<"Main server has received the request on User "<<userID <<" in "<< state <<" from client "<<clientID <<" using TCP over port "<< portNumber << endl;
 			if (db.find(state) == db.end()) {
 				//send # to client
 				cout << state << " does not show up in server A&B" << endl;
 				if (send(new_fd, "#", 2, 0) == -1) {
 					perror("send failed !");
 				}
-				cout <<"Main Server has sent “"<<state<< ": Not found” to client "<<clientID<<" using TCP over port ???"<<endl;
+				cout <<"Main Server has sent “"<<state<< ": Not found” to client "<<clientID<<" using TCP over port "<< portNumber<<endl;
 		    	close(new_fd);
 				exit(EXIT_SUCCESS);
 
 				continue;
 			} else if (!db[state].count(userID)) {
-				for (auto& it : db[state]) {
+				/*for (auto& it : db[state]) {
 					cout << it.first <<" : " << it.first.size() << endl;
-				}
+				}*/
 				//send @ to client
 				if (send(new_fd, "@", 2, 0) == -1) {
 					perror("send failed !");
@@ -327,7 +327,7 @@ int main()
 			cout << state << " shows up in server " << sname << endl;
 			input = state+"$"+userID;
 			result = getUDPresult (destPort, input, sname, userID);
-			cout <<"Main Server has sent request of User "<<userID<<" to server "<<sname <<" using UDP over port ???"<< endl;
+			cout <<"Main Server has sent request of User "<<userID<<" to server "<<sname <<" using UDP over port "<<portNumber<< endl;
 			cout <<"Main server has received searching result of User "; 
 			//send the result to client through TCP
 			for (string s : result) {
@@ -342,7 +342,7 @@ int main()
 				perror("send failed !");
 			}
 			cout <<" from server " << sname << endl;
-			cout <<"Main Server has sent searching result(s) to client "<<clientID<<" using TCP over port ???" << endl;
+			cout <<"Main Server has sent searching result(s) to client "<<clientID<<" using TCP over port "<<portNumber << endl;
 		    close(new_fd);
             //exit(0);
 			exit(EXIT_SUCCESS);
