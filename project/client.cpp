@@ -109,7 +109,7 @@ int main()
 			numbytes = recv(sockfd, buf, MAXDATASIZE, 0);
 			string s = "";
 			for (int i = 0; i < numbytes; i++) s.push_back(buf[i]);
-			cout << s <<" : " << numbytes << endl;
+			//cout << s <<" : " << numbytes << endl;
 			//cout <<"receive msg is " << buf <<" packet length is " << numbytes << endl;
 			if (numbytes < 0) {
 				cout <<"---------- recevie error -----------" << endl;
@@ -118,19 +118,22 @@ int main()
 				close(sockfd);
 				exit(1);
 			}
+			res+=s;
 			if (s[0] == '#') {
 				cout <<state <<" : Not found" << endl;
 				break;
 			} else if (s[0] == '@') {
 				cout << userID <<" : Not found" << endl;
 				break;
-			} else if (s[0] == '$')break;
-			res+=s;
-			res+=",";
-		} while (buf[0]!='$');
+			} else if (s.find('$') != std::string::npos) {
+				res.pop_back();
+				break;
+			}
+		} while (1);
+		//cout << res << endl;
 		cout <<"Main server has received the request on city "+state+" from client "+ clientID +" using TCP over port "<< ntohs(sinp->sin_port) << endl;
-		if (res.size() == 0) continue;
-		res.pop_back();
+		if (!isdigit(res[0])) continue;
+		while (!isdigit(res.back())) res.pop_back();
 		cout <<"Client has received results from Main Server:"<<endl;
 		cout <<"User "<< res <<" is/are possible friend(s) of User "<< userID<<" in " << state << endl;
 		//cout <<endl<< buf << endl;

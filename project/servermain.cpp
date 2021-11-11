@@ -90,7 +90,7 @@ void getDB () {
 		destAddr.sin_port = htons(31544);
 		sendto(sockUDP, sent, 2, 0,  (struct sockaddr*)&destAddr, (socklen_t)sizeof(destAddr));
 		do {
-			memset(buf, 0, sizeof buf);
+			//memset(buf, 0, sizeof buf);
 			numbytes = recvfrom(sockUDP, buf, MAXDATASIZE, 0, (struct sockaddr*)&destAddr, &alen);
 			//cout <<"numbytes: " << numbytes<<endl;
 			if (numbytes < 0) {
@@ -332,7 +332,8 @@ int main()
 			//send the result to client through TCP
 			for (string s : result) {
 				cout << s <<",";
-				if (send(new_fd, &s[0], s.size()+1, 0) == -1) {
+				string tmp = s+",";
+				if (send(new_fd, &tmp[0], tmp.size()+1, 0) == -1) {
 					perror("send failed !");
 				}
 			}

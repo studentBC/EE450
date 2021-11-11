@@ -108,7 +108,7 @@ int main () {
 			for (auto& it: prepareToSend) {
 				sendto(sockfd, &it.first[0], it.first.size()+1, 0, (const struct sockaddr *) &cliaddr, (socklen_t)len);
 				for (auto& s : it.second) {
-					cout << s << " : " << s.size() << endl;
+					//cout << s << " : " << s.size() << endl;
 					sendto(sockfd, &s[0], s.size()+1, 0, (const struct sockaddr *) &cliaddr, (socklen_t)len);
 				}
 				//cout << endl;
