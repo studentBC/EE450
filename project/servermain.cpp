@@ -78,7 +78,7 @@ void getDB () {
 				//cout << buf[i];
 				state.push_back(buf[i]);
 			}
-			cout <<endl<< state << " its size  " << state.size() << " numsize " << numbytes << endl;
+			//cout <<endl<< state << " its size  " << state.size() << " numsize " << numbytes << endl;
 			if (isalpha(state[0])) {
 				//state.pop_back();
 				city = state;
