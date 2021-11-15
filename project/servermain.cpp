@@ -8,6 +8,7 @@ int sockUDP = -1, sockTCP = -1;
 struct sockaddr_in destAddr, serverAddr;
 struct sigaction sa;
 struct addrinfo *UDPservinfo;
+string udpPortNumber = "112112";
 socklen_t  alen = sizeof(destAddr), sin_size;
 /*
  * this function will get userID and his corresponding state from backend UDP server
@@ -48,6 +49,7 @@ void getDB () {
 	socklen_t len = sizeof(sin);
 	if (getsockname(sockUDP, (struct sockaddr *)&sin, &len) == -1) perror("getsockname");
 	else printf("port number %d\n", ntohs(sin.sin_port));
+	udpPortNumber = to_string(ntohs(sin.sin_port));
 	/*	perror("UDP Bind Error");
 		exit(1);
 	}*/
@@ -85,7 +87,7 @@ void getDB () {
 				stateA.push_back(city);
 			} else db[city][state] = "30544";
 		} while(buf[0]!='$');
-		cout<<"Main server has received the state list from server A using UDP over port 32544"<<endl;
+		cout<<"Main server has received the state list from server A using UDP over port "<< udpPortNumber  <<endl;
 		//cout <<"--------- lets start to process server B ----------" << endl;
 		destAddr.sin_port = htons(31544);
 		sendto(sockUDP, sent, 2, 0,  (struct sockaddr*)&destAddr, (socklen_t)sizeof(destAddr));
@@ -111,7 +113,7 @@ void getDB () {
 			} else db[city][state] = "31544";
 		} while(buf[0]!='$');
 
-		cout<<"Main server has received the state list from server B using UDP over port 32544"<<endl;
+		cout<<"Main server has received the state list from server B using UDP over port " << udpPortNumber  <<endl;
 	}
 	cout <<"Server A"<<endl;
 	for (string& s: stateA) {
@@ -327,7 +329,7 @@ int main()
 			cout << state << " shows up in server " << sname << endl;
 			input = state+"$"+userID;
 			result = getUDPresult (destPort, input, sname, userID);
-			cout <<"Main Server has sent request of User "<<userID<<" to server "<<sname <<" using UDP over port "<<portNumber<< endl;
+			cout <<"Main Server has sent request of User "<<userID<<" to server "<<sname <<" using UDP over port "<<udpPortNumber << endl;
 			cout <<"Main server has received searching result of User "; 
 			//send the result to client through TCP
 			for (string s : result) {

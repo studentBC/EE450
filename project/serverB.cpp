@@ -63,8 +63,8 @@ int main () {
 	processData("dataB.txt");	
 	int sockfd;
     char buffer[MAXLINE];
-    struct sockaddr_in servaddr, cliaddr;
-
+    struct sockaddr_in servaddr, cliaddr, sin;
+	int addrlen = sizeof(servaddr);
     // Creating socket file descriptor
 	// 0 is default otherwise we should use IPPROTO_UDP
     if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) {
@@ -98,8 +98,12 @@ int main () {
 		for (string s : it.second) cout<<s <<" -> ";
 		cout <<endl;
 	}*/
+	//lets get UDP port number
+	getsockname(sockfd, (struct sockaddr *)&sin, (socklen_t *)&addrlen); // read binding
+	//local_port = ntohs(sin.sin_port);  // get the port number
 
-	cout <<"Server B is up and running using UDP on port 31544" << endl;
+
+	cout <<"Server B is up and running using UDP on port "<< ntohs(sin.sin_port) << endl;
     len = sizeof(cliaddr);  //len is value/resuslt
 	while (1) {
 		n = recvfrom(sockfd, (char *)buffer, MAXLINE, MSG_WAITALL, ( struct sockaddr *) &cliaddr, (socklen_t *) &len);
