@@ -93,7 +93,7 @@ int main()
 		//cout <<"ai addr: " << p->ai_addr->sa_data << endl;
 		inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr),
 				s, sizeof s);
-		printf("client: connecting to %s\n", s);
+		//printf("client: connecting to %s\n", s);
 		//cout <<"prepare to send " << input << endl;
 
 
@@ -123,7 +123,7 @@ int main()
 				cout <<state <<" : Not found" << endl;
 				break;
 			} else if (s[0] == '@') {
-				cout << userID <<" : Not found" << endl;
+				cout <<"User "<< userID <<" : Not found" << endl;
 				break;
 			} else if (s.find('$') != std::string::npos) {
 				res.pop_back();
@@ -132,7 +132,10 @@ int main()
 		} while (1);
 		//cout << res << endl;
 		cout <<"Main server has received the request on city "+state+" from client "+ clientID +" using TCP over port "<< ntohs(sinp->sin_port) << endl;
-		if (!isdigit(res[0])) continue;
+		if (!isdigit(res[0])) {
+			cout <<"-----Start a new query-----" << endl;
+			continue;
+		}
 		while (!isdigit(res.back())) res.pop_back();
 		cout <<"Client has received results from Main Server:"<<endl;
 		cout <<"User "<< res <<" is/are possible friend(s) of User "<< userID<<" in " << state << endl;

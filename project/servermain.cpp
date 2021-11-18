@@ -137,7 +137,7 @@ void getDB () {
 vector<string> getUDPresult (uint32_t destPort, string input, string sname, string userID) {
 	int count = 0, numbytes;
 	destAddr.sin_port = htons(destPort);
-	cout << "send input " << input << " to dest " << destPort << endl;
+	//cout << "send input " << input << " to dest " << destPort << endl;
 	sendto(sockUDP, &input[0], input.size()+1, 0, (struct sockaddr*)&destAddr, (socklen_t)sizeof(destAddr));
 
 	//if (sname == "A") cout <<"The Main Server has sent request for "<<input<<" to server A using UDP over port 30544"<<endl;
@@ -167,11 +167,11 @@ vector<string> getUDPresult (uint32_t destPort, string input, string sname, stri
 		ans+=",";
 		result.push_back(res);
 	} while(buf[0]!='$');
-	cout <<"The Main server has received searching results of "<< input <<" from server " << sname <<endl;
+	cout <<"The Main server has received searching results of User "<< userID <<" from server " << sname <<endl;
 	ans.pop_back();
 	//cout << ans<< endl;
-	cout <<endl << "There are "<<count<<" distinct cities in Indiana. Their names are" << endl;
-	cout << ans << endl;
+	//cout <<endl << "There are "<<count<<" distinct cities in Indiana. Their names are" << endl;
+	//cout << ans << endl;
 	freeaddrinfo(UDPservinfo); // all done with this structure
 	return result;
 }
@@ -303,10 +303,18 @@ int main()
 				exit(EXIT_SUCCESS);
 
 				continue;
-			} else if (!db[state].count(userID)) {
-				/*for (auto& it : db[state]) {
-					cout << it.first <<" : " << it.first.size() << endl;
-				}*/
+			}
+			if (db[state][userID] == "30544" || db.count(state)) {
+				sname = "A";
+				destPort = 30544;
+			} else {
+				sname = "B";
+				destPort = 31544;
+			}
+			cout << state << " shows up in server " << sname << endl;
+			input = state+"$"+userID;
+			result = getUDPresult (destPort, input, sname, userID);
+			if (result.size() == 0) {
 				//send @ to client
 				if (send(new_fd, "@", 2, 0) == -1) {
 					perror("send failed !");
@@ -318,17 +326,6 @@ int main()
 				//cout <<db[input] << endl;
 				continue;
 			}
-
-			if (db[state][userID] == "30544") {
-				sname = "A";
-				destPort = 30544;
-			} else {
-				sname = "B";
-				destPort = 31544;
-			}
-			cout << state << " shows up in server " << sname << endl;
-			input = state+"$"+userID;
-			result = getUDPresult (destPort, input, sname, userID);
 			cout <<"Main Server has sent request of User "<<userID<<" to server "<<sname <<" using UDP over port "<<udpPortNumber << endl;
 			cout <<"Main server has received searching result of User "; 
 			//send the result to client through TCP
@@ -346,6 +343,7 @@ int main()
 			cout <<" from server " << sname << endl;
 			cout <<"Main Server has sent searching result(s) to client "<<clientID<<" using TCP over port "<<portNumber << endl;
 		    close(new_fd);
+			cout <<endl<<"-----Start a new query-----" << endl;
             //exit(0);
 			exit(EXIT_SUCCESS);
         } else if (pid < 0) {
