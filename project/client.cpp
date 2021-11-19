@@ -47,7 +47,7 @@ int main()
     struct addrinfo hints, *servinfo, *p;
     int rv;
     char s[INET6_ADDRSTRLEN]= "127.0.0.1";; 
-	string state = "", clientID = "", userID = "";
+	string state = "", clientID = "", userID = "", portNumber = "112";
 	clientID = getClientID();
 	recordClientID(clientID);
 	//read user input
@@ -95,6 +95,15 @@ int main()
 				s, sizeof s);
 		//printf("client: connecting to %s\n", s);
 		//cout <<"prepare to send " << input << endl;
+		//cout <<" ----------------------- " << endl;
+		struct sockaddr_in sin;
+		socklen_t len = sizeof(sin);
+		if (getsockname(sockfd, (struct sockaddr *)&sin, &len) == -1)
+			perror("getsockname");
+		else
+			portNumber =  to_string(ntohs(sin.sin_port));
+		//cout <<" ----------------------- " << endl;
+
 
 
 		string res = "";
@@ -102,8 +111,9 @@ int main()
 		char sent[128];
 		for (int i = 0; i < rawdata.size(); i++) sent[i] = rawdata[i];
 		send(sockfd , sent, rawdata.size(), 0 );
-		struct sockaddr_in  *sinp = (struct sockaddr_in *)p->ai_addr;
-		cout << "Client has sent "<< state << " and User "<< userID  << " to Main Server using TCP over port "<< ntohs(sinp->sin_port) << endl;
+		//get server port number
+		//struct sockaddr_in  *sinp = (struct sockaddr_in *)p->ai_addr;
+		cout << "Client has sent "<< state << " and User "<< userID  << " to Main Server using TCP over port "<< portNumber << endl;
     	char buf[MAXDATASIZE];
 		do {
 			numbytes = recv(sockfd, buf, MAXDATASIZE, 0);
@@ -131,7 +141,7 @@ int main()
 			}
 		} while (1);
 		//cout << res << endl;
-		cout <<"Main server has received the request on city "+state+" from client "+ clientID +" using TCP over port "<< ntohs(sinp->sin_port) << endl;
+		cout <<"Main server has received the request on city "+state+" from client "+ clientID +" using TCP over port "<< portNumber << endl;
 		if (!isdigit(res[0])) {
 			cout <<"-----Start a new query-----" << endl;
 			continue;

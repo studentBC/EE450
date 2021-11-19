@@ -8,7 +8,7 @@ int sockUDP = -1, sockTCP = -1;
 struct sockaddr_in destAddr, serverAddr;
 struct sigaction sa;
 struct addrinfo *UDPservinfo;
-string udpPortNumber = "112112";
+string udpPortNumber = "112112", portNumber = "112";
 socklen_t  alen = sizeof(destAddr), sin_size;
 /*
  * this function will get userID and his corresponding state from backend UDP server
@@ -224,7 +224,7 @@ void startTCP () {
 
         break;
     }
-
+	portNumber  =  to_string(ntohs(((struct sockaddr_in *)servinfo->ai_addr)->sin_port));
 	//cout <<"***  portNumber " << to_string(ntohs(((struct sockaddr_in *)servinfo->ai_addr)->sin_port)) << "     ***"   <<endl;
     freeaddrinfo(servinfo); // all done with this structure
 
@@ -273,7 +273,7 @@ int main()
 			string request (buf);	
 
 			
-			string portNumber = to_string(ntohs(clinetAddr.sin_port));
+			//string portNumber = to_string(ntohs(clinetAddr.sin_port));
 
             close(sockTCP); // child doesn't need the listener
 
@@ -304,13 +304,17 @@ int main()
 
 				continue;
 			}
-			if (db[state][userID] == "30544" || db.count(state)) {
-				sname = "A";
-				destPort = 30544;
-			} else {
-				sname = "B";
-				destPort = 31544;
+			for (auto& it: db[state]) {
+				if (it.second == "30544") {
+					sname = "A";
+					destPort = 30544;
+				} else {
+					sname = "B";
+					destPort = 31544;
+				}
+				break;
 			}
+			
 			cout << state << " shows up in server " << sname << endl;
 			input = state+"$"+userID;
 			result = getUDPresult (destPort, input, sname, userID);
