@@ -160,7 +160,7 @@ vector<string> getUDPresult (uint32_t destPort, string input, string sname, stri
 		string res(buf);
 		if (res[0] == '$')break;
 		else if (res[0] == '#') {
-			cout<< "Main server has received “"<< userID <<": Not found” from server " << sname << endl;
+			cout<< "Main server has received “User "<< userID <<": Not found” from server " << sname << endl;
 			return {};
 		}
 		count++;
@@ -324,6 +324,7 @@ int main()
 				if (send(new_fd, "@", 2, 0) == -1) {
 					perror("send failed !");
 				}
+				cout <<"Main Server has sent message to client "<<clientID <<" using TCP over "<<portNumber << endl;
 				//cout << input<<" does not show up in server A&B"<<endl;
 				cout <<endl<<"-----Start a new query-----" << endl;
 		    	close(new_fd);

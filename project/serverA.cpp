@@ -137,7 +137,7 @@ int main () {
 			cout <<"User " << userID <<" does not show up in " << key << endl;
 			//# means that we cannot find the corresponding userID here
 			sendto(sockfd, "#", 2, 0, (const struct sockaddr *) &cliaddr, (socklen_t)len);
-			cout <<"Server A has sent “" << userID <<" not found” to Main Server"<<endl;
+			cout <<"Server A has sent “User " << userID <<" not found” to Main Server"<<endl;
 			continue;
 		}
 		//cout <<"its length: " << n << endl;
