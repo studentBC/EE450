@@ -1,0 +1,37 @@
+• Your Full Name as given in the class list: Lung Chin
+
+• Your Student ID: 8928699544
+
+• Briefly summarize what you have done in the assignment. (Please do not repeat the project
+description).
+
+For this project, I wrote four programs to deal with a mechanism for user to find potential friends for certain userID in a specific state.
+There are two backend server A and B which use UDP socket to communicate with servermain. Backend server are the database for servermain to look for client's answer. For servermain it can fork child process to handle client's request. Once it knows clients' request is valid it will send this request to the corresponding backend server (we use state as duty seperate). the client program can deal with user input and encode client's request to servermain. It use TCP to communicate with servermain. In short, servermain has both TCP and UDP socket to communicate with client and backend servers.
+
+• List all your code files and briefly summarize their fulfilled functionalities. (Please do not
+repeat the project description).
+
+client.cpp: it will let user to send out a request which contains userID and state to look for the potential friends of userID in the specific state. To tell which client is sending data, we let client program to write their own client ID in a file and send its client ID to servermain.
+
+servermain.cpp: it can handle request sent from client.cpp and send out valid client's request (the 'state' is already in its db) to the corresponding backend server. if the state that client sent is not on its list, it will simply reply 'state' not found to client (by sending '@' to client) without sending request to backend server.
+
+serverA.cpp and serverB.cpp: 
+when it starts, it reads the data which includes user and state list in txt file and send these list to servermain program so that servermain could establish its db. Besides, it can also process the request that servermain sent by looking its db to answer who are the potential friends for 'userID' in the 'state'
+Since the state or user list might be very long, we send out our data with '$' as ending to let servermain knows that it is the last packet.
+If backend servers cannot find the coresponding userID in its db, they will send out '#' to indicate that user not found
+
+
+• The format of all the messages exchanged between servers.
+the request that client send will follow: clientID+","+state+"$"+userID
+the request that servermain send to backend server will follow: state$userID
+the state list that backend server send to servermain will be: state1,state2,state3 .... etc
+'#' stands for user not found
+'$' end of packet
+'@' userID not found
+
+• Any idiosyncrasy of your project. It should say under what conditions the project fails, if any.
+should be no failed.
+
+• Reused Code: Did you use code from anywhere for your project? If not, say so. If so, say
+what functions and where they're from. (Also identify this with a comment in the source code.)
+some codes are from https://beej.us/guide/bgnet/html/#socket
