@@ -139,6 +139,7 @@ vector<string> getUDPresult (uint32_t destPort, string input, string sname, stri
 	destAddr.sin_port = htons(destPort);
 	//cout << "send input " << input << " to dest " << destPort << endl;
 	sendto(sockUDP, &input[0], input.size()+1, 0, (struct sockaddr*)&destAddr, (socklen_t)sizeof(destAddr));
+	cout <<"Main Server has sent request of User "<<userID<<" to server "<<sname <<" using UDP over port "<<udpPortNumber << endl;
 
 	//if (sname == "A") cout <<"The Main Server has sent request for "<<input<<" to server A using UDP over port 30544"<<endl;
 	//else cout <<"The Main Server has sent request for "<<input<<" to server B using UDP over port 31544"<<endl;
@@ -330,7 +331,7 @@ int main()
 				//cout <<db[input] << endl;
 				continue;
 			}
-			cout <<"Main Server has sent request of User "<<userID<<" to server "<<sname <<" using UDP over port "<<udpPortNumber << endl;
+			//cout <<"Main Server has sent request of User "<<userID<<" to server "<<sname <<" using UDP over port "<<udpPortNumber << endl;
 			cout <<"Main server has received searching result of User "; 
 			//send the result to client through TCP
 			for (string s : result) {
