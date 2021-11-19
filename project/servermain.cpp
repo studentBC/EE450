@@ -286,9 +286,9 @@ int main()
 				} else if (c == '$') {
 					turn = 1;
 				} else {
-					if (turn == 1) userID.push_back(c);
+					if (turn == 1 && isdigit(c)) userID.push_back(c);
 					else if (turn == 0) state.push_back(c);
-					else clientID.push_back(c);
+					else if (turn ==2 && isdigit(c)) clientID.push_back(c);
 				}
 			}
 			cout <<"Main server has received the request on User "<<userID <<" in "<< state <<" from client "<<clientID <<" using TCP over port "<< portNumber << endl;
