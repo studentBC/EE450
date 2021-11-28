@@ -27,7 +27,7 @@ void getDB () {
 	*/
     char s[INET6_ADDRSTRLEN]= "127.0.0.1";; 
 	string input = "", clientID = "";
-	cout <<"Main server is up and running."<<endl;
+	//cout <<"Main server is up and running."<<endl;
 
 
 	if ((sockUDP = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
