@@ -158,7 +158,7 @@ int main()
 		cout <<"The Main server has received searching results of "<< input <<" from server " << sname <<endl;
 		ans.pop_back();
 		//cout << ans<< endl;
-		cout <<endl << "There are "<<count<<" distinct cities in Indiana. Their names are" << endl;
+		cout <<endl << "There are "<<count<<" distinct cities in "<< input <<". Their names are" << endl;
 		cout << ans << endl;
 		cout <<endl<<"-----Start a new query-----" << endl;
 	}
